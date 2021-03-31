@@ -3,7 +3,7 @@ Adds Support for Electrolux Convector
 
 Configuration for this platform:
 climate:
-  - platform: electrolux
+  - platform: electrolux_remote
     name: Electrolux Convector
     username: phone
     password: 123456

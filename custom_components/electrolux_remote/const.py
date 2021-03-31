@@ -1,6 +1,6 @@
 """Constants for the Electrolux integration."""
 
-DOMAIN = "electrolux"
+DOMAIN = "electrolux_remote"
 
 APPCODE_ELECTROLUX = "electrolux"
 HOST_RUSKLIMAT = "http://dongle.rusklimat.ru"
