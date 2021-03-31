@@ -1,0 +1,18 @@
+{
+  "domain": "electrolux_remote",
+  "name": "Electrolux remote",
+  "config_flow": true,
+  "documentation": "https://github.com/Ailme/home_assistant_electrolux_remote",
+  "issue_tracker": "https://github.com/Ailme/home_assistant_electrolux_remote/issues",
+  "requirements": [
+    "cryptography==3.4.7"
+  ],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": [
+    "@Ailme"
+  ],
+  "version": "0.0.1"
+}
