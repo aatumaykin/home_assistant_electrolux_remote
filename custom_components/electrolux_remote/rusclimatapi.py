@@ -30,8 +30,11 @@ class RusclimatApi:
         self.session = None
 
     def __del__(self):
-        _LOGGER.debug('Destructor called.')
-        self.session.close()
+        _LOGGER.debug('api.destructor')
+        # try:
+        #     await self.session.close()
+        # except Exception:
+        #     pass
 
     def _create_session(self):
         self.session = ClientSession()
@@ -51,7 +54,7 @@ class RusclimatApi:
         resp = await self.session.post(f"{self._host}/{url}", json=payload, headers=headers)
         json = await resp.json()
 
-        _LOGGER.debug(json)
+        _LOGGER.debug(f"response: {json}")
 
         if json is None:
             raise InvalidResponse(f"Response error: json is None")

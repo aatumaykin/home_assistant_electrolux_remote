@@ -71,6 +71,8 @@ CONVECTOR_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_CONVECTOR.items()}
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_devices):
     data = config_entry.options if config_entry.options != {} else config_entry.data
 
+    _LOGGER.debug("climate.async_setup_entry")
+
     api = RusclimatApi(
         host=data["host"],
         username=data["username"],
@@ -81,12 +83,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
     devices = []
     for deviceData in json["result"]["device"]:
-        _LOGGER.debug(deviceData)
+        _LOGGER.debug(f"device: {deviceData}")
 
         if deviceData["type"] == TYPE_CONVECTOR_2:
             device = Convector2Climate(Convector2(uid=deviceData["uid"], api=api, data=deviceData))
             devices.append(device)
 
+    _LOGGER.debug(devices)
     async_add_devices(devices)
 
 
@@ -95,6 +98,7 @@ class Convector2Climate(ClimateEntity):
 
     def __init__(self, device: Convector2):
         """Initialize"""
+        _LOGGER.debug("climate.init")
 
         self._icon = "mdi:radiator"
         self._device = device
@@ -111,6 +115,8 @@ class Convector2Climate(ClimateEntity):
         self._update()
 
     def _update(self):
+        _LOGGER.debug("climate.update")
+
         self._current_temp = self._device.current_temp
         self._heating = self._device.state == STATE_ON
         self._preset = CONVECTOR_PRESET_TO_HA.get(WorkMode(self._device.mode))
