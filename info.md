@@ -8,10 +8,15 @@
 - заполнить логин/пароль от приложения Home Comfort: climatic appliances
 - после авторизации на сервере автоматически должно добавиться устройство Climate связанное с конвектором
 
-### Features
+## Features
 Добавлена поддержка только одного вида конвекторов, которые в приложении обозначены как "convector24"
 
 Управление конвектором:
 - вкл/выкл
 - изменение температуры
 - переключение режимов
+
+## Screenshot
+<img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">
+<img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-2.png?raw=true" width="250">
+<img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-3.png?raw=true" width="250">
