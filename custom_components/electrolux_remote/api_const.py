@@ -16,5 +16,7 @@ API_UPDATE_CALENDAR_SLOTS = "api/setTimeSlot"
 
 # response code
 ERROR_INCORRECT_LOGIN_OR_PASSWORD = "106"
-ERROR_USER_NOT_FOUND = "136"
-ERROR_DEVICE_UNAVAILABLE = "153"
+ERROR_INCORRECT_PHONE = "112"               # Слишком короткий номер телефона
+ERROR_TOKEN_NOT_FOUND = "121"               # Токен не найден
+ERROR_USER_NOT_FOUND = "136"                # Пользователь не найден
+ERROR_DEVICE_UNAVAILABLE = "153"            # Ошибка - устройство не в сети или неизвестный тип

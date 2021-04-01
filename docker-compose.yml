@@ -44,6 +44,17 @@ services:
     ports:
       - "8123:8123"
 
+#  homeassistant-2021-4-0b0:
+#    container_name: homeassistant
+#    image: homeassistant/home-assistant:2021.4.0b0
+#    environment:
+#      - TZ=Europe/Moscow
+#    volumes:
+#      - ./ha/2021.4.0b0:/config
+#    restart: always
+#    ports:
+#      - "8123:8123"
+
   homeassistant-latest:
     container_name: homeassistant
     image: homeassistant/home-assistant:latest

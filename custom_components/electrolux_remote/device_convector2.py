@@ -1,47 +1,90 @@
-"""Convector2 class"""
+"""Convector2 class (type=convector24)"""
 
 import logging
 
-from .device_base import Device
+from enum import Enum, IntEnum
+
+from .device_base import Device, State
 from .rusclimatapi import RusclimatApi
-from .const import *
-from .enum import *
 
 _LOGGER = logging.getLogger(__name__)
 
+PRESET_0 = 0
+PRESET_1 = 1
+PRESET_2 = 2
+PRESET_3 = 3
+PRESET_4 = 4
+PRESET_5 = 5
+PRESET_6 = 6
+PRESET_7 = 7
+
+DELTA_ECO_DEFAULT = 4
+TEMP_ANTIFROST_DEFAULT = 3
+
+TEMP_COMFORT_MIN = 10
+TEMP_COMFORT_MAX = 35
+
+
+class BrightnessMode(IntEnum):
+    HALF = 0
+    FULL = 1
+
+
+class LedMode(IntEnum):
+    PERMANENT = 0
+    AUTO = 1
+
+
+class HeatMode(IntEnum):
+    AUTO = 0
+    MANUAL = 1
+
+
+class PowerMode(IntEnum):
+    POWER_0 = 0
+    POWER_1 = 1
+    POWER_2 = 2
+    POWER_3 = 3
+    POWER_4 = 4
+    POWER_5 = 5
+
+
+class WorkMode(IntEnum):
+    COMFORT = 0
+    ECO = 1
+    NO_FROST = 2
+    OFF = 3
 
 class Convector2(Device):
 
     def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
         _LOGGER.debug("Convector2.init")
 
-        super().__init__(uid)
+        super().__init__(uid, api)
 
-        self._api = api
-        self._state = STATE_OFF
-        self._child_lock = STATE_OFF
-        self._sensor_fault = STATE_OFF
-        self._window_open = STATE_OFF
-        self._mute = STATE_OFF
-        self._window_opened = STATE_OFF
-        self._calendar_on = STATE_OFF
+        self._child_lock = State.OFF.value
+        self._sensor_fault = State.OFF.value
+        self._window_open = State.OFF.value
+        self._mute = State.OFF.value
+        self._window_opened = State.OFF.value
+        self._calendar_on = State.OFF.value
         self._brightness = BrightnessMode.FULL.value
         self._led_off_auto = LedMode.PERMANENT.value
         self._temp_comfort = TEMP_COMFORT_MIN
         self._delta_eco = DELTA_ECO_DEFAULT
         self._temp_antifrost = TEMP_ANTIFROST_DEFAULT
-        self._mode = WorkMode.MODE_COMFORT.value
+        self._mode = WorkMode.COMFORT.value
         self._mode_temp_1 = 0
         self._mode_temp_2 = 0
         self._mode_temp_3 = 0
         self._hours = 0
         self._minutes = 0
-        self._timer = STATE_OFF
+        self._timer = State.OFF.value
         self._current_temp = 0
         self._heat_mode = HeatMode.AUTO.value
         self._power = PowerMode.POWER_0.value
         self._code = 0
-        self._lcd_on = STATE_ON
+        self._lcd_on = State.ON.value
         self._time_seconds = 0
         self._time_minutes = 0
         self._time_hour = 0
@@ -56,35 +99,34 @@ class Convector2(Device):
         self._preset_friday = PRESET_0
         self._preset_saturday = PRESET_0
         self._preset_sunday = PRESET_0
-        self._preset_day_1 = WorkMode.MODE_OFF.value
-        self._preset_day_2 = WorkMode.MODE_OFF.value
-        self._preset_day_3 = WorkMode.MODE_OFF.value
-        self._preset_day_4 = WorkMode.MODE_OFF.value
-        self._preset_day_5 = WorkMode.MODE_OFF.value
-        self._preset_day_6 = WorkMode.MODE_OFF.value
-        self._preset_day_7 = WorkMode.MODE_OFF.value
-        self._preset_day_8 = WorkMode.MODE_OFF.value
-        self._preset_day_9 = WorkMode.MODE_OFF.value
-        self._preset_day_10 = WorkMode.MODE_OFF.value
-        self._preset_day_11 = WorkMode.MODE_OFF.value
-        self._preset_day_12 = WorkMode.MODE_OFF.value
-        self._preset_day_13 = WorkMode.MODE_OFF.value
-        self._preset_day_14 = WorkMode.MODE_OFF.value
-        self._preset_day_15 = WorkMode.MODE_OFF.value
-        self._preset_day_16 = WorkMode.MODE_OFF.value
-        self._preset_day_17 = WorkMode.MODE_OFF.value
-        self._preset_day_18 = WorkMode.MODE_OFF.value
-        self._preset_day_19 = WorkMode.MODE_OFF.value
-        self._preset_day_20 = WorkMode.MODE_OFF.value
-        self._preset_day_21 = WorkMode.MODE_OFF.value
-        self._preset_day_22 = WorkMode.MODE_OFF.value
-        self._preset_day_23 = WorkMode.MODE_OFF.value
-        self._preset_day_24 = WorkMode.MODE_OFF.value
+        self._preset_day_1 = WorkMode.OFF.value
+        self._preset_day_2 = WorkMode.OFF.value
+        self._preset_day_3 = WorkMode.OFF.value
+        self._preset_day_4 = WorkMode.OFF.value
+        self._preset_day_5 = WorkMode.OFF.value
+        self._preset_day_6 = WorkMode.OFF.value
+        self._preset_day_7 = WorkMode.OFF.value
+        self._preset_day_8 = WorkMode.OFF.value
+        self._preset_day_9 = WorkMode.OFF.value
+        self._preset_day_10 = WorkMode.OFF.value
+        self._preset_day_11 = WorkMode.OFF.value
+        self._preset_day_12 = WorkMode.OFF.value
+        self._preset_day_13 = WorkMode.OFF.value
+        self._preset_day_14 = WorkMode.OFF.value
+        self._preset_day_15 = WorkMode.OFF.value
+        self._preset_day_16 = WorkMode.OFF.value
+        self._preset_day_17 = WorkMode.OFF.value
+        self._preset_day_18 = WorkMode.OFF.value
+        self._preset_day_19 = WorkMode.OFF.value
+        self._preset_day_20 = WorkMode.OFF.value
+        self._preset_day_21 = WorkMode.OFF.value
+        self._preset_day_22 = WorkMode.OFF.value
+        self._preset_day_23 = WorkMode.OFF.value
+        self._preset_day_24 = WorkMode.OFF.value
         self._tempid = None
         self._mac = None
         self._room = None
         self._sort = 0
-        self._type = TYPE_CONVECTOR_2
         self._curr_slot = None
         self._active_slot = None
         self._slop = None
@@ -93,16 +135,9 @@ class Convector2(Device):
         self._wait_slot = None
         self._curr_slot_dropped = 0
         self._curr_scene_dropped = 0
-        self._online = STATE_OFF
-        self._lock = STATE_OFF
+        self._lock = State.OFF.value
 
         self._from_json(data)
-
-    async def set_state(self, value: bool):
-        _LOGGER.debug(f"set_state: {value}")
-
-        if await self._api.set_device_param(self.uid, 'state', int(value)):
-            await self.update()
 
     async def set_child_lock(self, value: bool):
         _LOGGER.debug(f"set_child_lock: {value}")
@@ -184,27 +219,27 @@ class Convector2(Device):
 
     @property
     def state(self) -> bool:
-        return int(self._state) == STATE_ON
+        return int(self._state) == State.ON.value
 
     @property
     def child_lock(self) -> bool:
-        return int(self._child_lock) == STATE_ON
+        return int(self._child_lock) == State.ON.value
 
     @property
     def window_open(self) -> bool:
-        return int(self._window_open) == STATE_ON
+        return int(self._window_open) == State.ON.value
 
     @property
     def window_opened(self) -> bool:
-        return int(self._window_opened) == STATE_ON
+        return int(self._window_opened) == State.ON.value
 
     @property
     def mute(self) -> bool:
-        return int(self._mute) == STATE_ON
+        return int(self._mute) == State.ON.value
 
     @property
     def calendar_on(self) -> bool:
-        return int(self._calendar_on) == STATE_ON
+        return int(self._calendar_on) == State.ON.value
 
     @property
     def brightness(self) -> int:
@@ -323,24 +358,9 @@ class Convector2(Device):
         return self._mac
 
     @property
-    def online(self) -> bool:
-        return int(self._online) == STATE_ON
-
-    @property
     def sort(self) -> int:
         return int(self._sort)
 
     @property
     def lock(self) -> bool:
-        return int(self._lock) == STATE_ON
-
-    async def update(self):
-        for device in await self._api.get_device_params(self.uid):
-            if device["uid"] == self.uid:
-                self._from_json(device)
-
-    def _from_json(self, data: dict):
-        """Fill self from json data"""
-        for key in data:
-            setattr(self, f"_{key}", data[key])
-
+        return int(self._lock) == State.ON.value
