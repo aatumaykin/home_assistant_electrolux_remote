@@ -22,7 +22,6 @@ STEP_USER_DATA_SCHEMA = vol.Schema({
 
 async def validate_input(hass: core.HomeAssistant, data: dict):
     """Validate the user input allows us to connect."""
-
     if len(data["host"]) < 3:
         raise InvalidHost
 
@@ -44,9 +43,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def __init__(self):
         """Initialize."""
+        _LOGGER.debug("ConfigFlow.init")
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
+        _LOGGER.debug("ConfigFlow.async_step_user")
+
         if user_input is None:
             return self.async_show_form(
                 step_id="user", data_schema=STEP_USER_DATA_SCHEMA

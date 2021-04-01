@@ -13,6 +13,8 @@ _LOGGER = logging.getLogger(__name__)
 class Convector2(Device):
 
     def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
+        _LOGGER.debug("Convector2.init")
+
         super().__init__(uid)
 
         self._api = api

@@ -22,6 +22,8 @@ class RusclimatApi:
     """ Wrapper class to the Rusclimat API """
 
     def __init__(self, host: str, username: str, password: str, appcode: str):
+        _LOGGER.debug("RusclimatApi.init")
+
         self._host = host
         self._username = username
         self._password = password
@@ -30,13 +32,14 @@ class RusclimatApi:
         self.session = None
 
     def __del__(self):
-        _LOGGER.debug('api.destructor')
+        _LOGGER.debug('RusclimatApi.destructor')
         # try:
         #     await self.session.close()
         # except Exception:
         #     pass
 
     def _create_session(self):
+        _LOGGER.debug('RusclimatApi._create_session')
         self.session = ClientSession()
 
     async def _request(self, url: str, payload: dict):
@@ -50,6 +53,9 @@ class RusclimatApi:
             "Accept-Encoding": "gzip",
             "User-Agent": "okhttp/4.3.1",
         }
+
+        _LOGGER.debug(f"request: {url}")
+        _LOGGER.debug(f"payload: {payload}")
 
         resp = await self.session.post(f"{self._host}/{url}", json=payload, headers=headers)
         json = await resp.json()

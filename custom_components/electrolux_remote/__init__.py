@@ -1,4 +1,6 @@
-"""The Electrolux remote integration."""
+"""
+The Electrolux remote integration.
+"""
 
 import logging
 import asyncio
@@ -22,6 +24,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up from a config entry."""
+    _LOGGER.debug("init.async_setup_entry")
 
     # hass.data[DOMAIN][entry.entry_id] = RusclimatApi(entry.data["host"])
 
@@ -37,6 +40,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
+    _LOGGER.debug("init.async_unload_entry")
+
     unload_ok = all(
         await asyncio.gather(
             *[

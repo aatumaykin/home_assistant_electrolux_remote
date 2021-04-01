@@ -69,6 +69,8 @@ CONVECTOR_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_CONVECTOR.items()}
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_devices):
+    _LOGGER.debug("climate.async_setup_entry")
+
     data = config_entry.options if config_entry.options != {} else config_entry.data
 
     _LOGGER.debug("climate.async_setup_entry")
@@ -98,7 +100,7 @@ class Convector2Climate(ClimateEntity):
 
     def __init__(self, device: Convector2):
         """Initialize"""
-        _LOGGER.debug("climate.init")
+        _LOGGER.debug("climate.Convector2Climate.init")
 
         self._icon = "mdi:radiator"
         self._device = device
@@ -115,7 +117,7 @@ class Convector2Climate(ClimateEntity):
         self._update()
 
     def _update(self):
-        _LOGGER.debug("climate.update")
+        _LOGGER.debug("climate.Convector2Climate.update")
 
         self._current_temp = self._device.current_temp
         self._heating = self._device.state == STATE_ON
