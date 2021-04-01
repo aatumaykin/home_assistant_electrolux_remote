@@ -1,0 +1,59 @@
+version: '3'
+services:
+  homeassistant-2021-1:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:2021.1.0
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./ha/2021.1:/config
+    restart: always
+    ports:
+      - "8123:8123"
+
+  homeassistant-2021-2:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:2021.2.0
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./ha/2021.2:/config
+    restart: always
+    ports:
+      - "8123:8123"
+
+  homeassistant-2021-3:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:2021.3.0
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./ha/2021.3:/config
+    restart: always
+    ports:
+      - "8123:8123"
+
+  homeassistant-2021-4:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:2021.4.0
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./ha/2021.4:/config
+    restart: always
+    ports:
+      - "8123:8123"
+
+  homeassistant-latest:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:latest
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./ha/latest:/config
+    restart: always
+    ports:
+      - "8123:8123"
+
+volumes:
+  ha:
