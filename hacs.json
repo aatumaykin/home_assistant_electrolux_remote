@@ -1,5 +1,5 @@
 {
   "name": "Electrolux device remote",
-  "domains": "electrolux_remote",
+  "domains": ["climate"],
   "iot_class": "Cloud Polling"
 }
