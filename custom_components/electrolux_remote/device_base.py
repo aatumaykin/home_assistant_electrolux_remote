@@ -3,7 +3,7 @@
 import logging
 
 from enum import IntEnum
-from .rusclimatapi import RusclimatApi
+from .api_interface import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,8 +14,7 @@ class State(IntEnum):
 
 
 class Device:
-
-    def __init__(self, uid: str, api: RusclimatApi):
+    def __init__(self, uid: str, api: ApiInterface):
         self._uid = uid
         self._api = api
 
@@ -41,6 +40,10 @@ class Device:
         """Fill self from json data"""
         for key in data:
             setattr(self, f"_{key}", data[key])
+
+    @property
+    def state(self) -> bool:
+        return int(self._state) == State.ON.value
 
     @property
     def online(self) -> bool:

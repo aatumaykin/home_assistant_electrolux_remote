@@ -5,11 +5,13 @@ import logging
 from .device_convector2 import (
     Convector2,
     WorkMode,
-    TEMP_COMFORT_MIN,
-    TEMP_COMFORT_MAX
+    TEMP_MIN,
+    TEMP_MAX,
+    TEMP_ANTIFROST_MIN,
+    TEMP_ANTIFROST_MAX
 )
 
-from .rusclimatapi import RusclimatApi
+from .api_interface import ApiInterface
 
 from homeassistant.components.climate import ClimateEntity
 
@@ -49,7 +51,7 @@ DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 class Convector2Climate(ClimateEntity):
     """Representation of an Climate."""
 
-    def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
+    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
         """Initialize"""
         _LOGGER.debug("Convector2Climate.init")
 
@@ -57,13 +59,14 @@ class Convector2Climate(ClimateEntity):
         self._device = Convector2(uid, api, data)
         self._name = "convector_" + self._device.uid
         self._uid = self._device.uid
-        self._min_temp = TEMP_COMFORT_MIN
-        self._max_temp = TEMP_COMFORT_MAX
+        self._min_temp = TEMP_MIN
+        self._max_temp = TEMP_MAX
         self._current_temp = None
         self._heating = False
         self._preset = None
         self._target_temperature = None
         self._available = False
+        self._name = None
 
         self._update()
 
@@ -75,17 +78,23 @@ class Convector2Climate(ClimateEntity):
         _LOGGER.debug("Convector2Climate.update")
 
         self._current_temp = self._device.current_temp
-        self._heating = self._device.state == State.ON.value
-        self._preset = DEVICE_PRESET_TO_HA.get(WorkMode(self._device.mode))
-        self._available = self._device.online == State.ON.value
+        self._heating = self._device.state
+        self._preset = DEVICE_PRESET_TO_HA.get(self._device.mode)
+        self._available = self._device.online
+        self._name = self._device.room
 
-        mode = WorkMode(self._device.mode)
-        if mode is WorkMode.COMFORT:
+        if self._device.mode is WorkMode.COMFORT:
             self._target_temperature = self._device.temp_comfort
-        elif mode is WorkMode.ECO:
+            self._min_temp = TEMP_MIN
+            self._max_temp = TEMP_MAX
+        elif self._device.mode is WorkMode.ECO:
             self._target_temperature = self._device.temp_comfort - self._device.delta_eco
-        elif mode is WorkMode.NO_FROST:
+            self._min_temp = TEMP_MIN - self._device.delta_eco
+            self._max_temp = TEMP_MAX - self._device.delta_eco
+        elif self._device.mode is WorkMode.NO_FROST:
             self._target_temperature = self._device.temp_antifrost
+            self._min_temp = TEMP_ANTIFROST_MIN
+            self._max_temp = TEMP_ANTIFROST_MAX
 
     @property
     def hvac_mode(self):
@@ -101,7 +110,6 @@ class Convector2Climate(ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-
         await self._device.set_state(not self._heating)
         self._update()
 
@@ -180,7 +188,14 @@ class Convector2Climate(ClimateEntity):
         if target_temp is None:
             return
 
-        await self._device.set_temp_comfort(target_temp)
+        if self._preset == PRESET_NO_FROST:
+            await self._device.set_temp_antifrost(target_temp)
+        elif self._preset == PRESET_ECO:
+            target_temp = target_temp + self._device.delta_eco
+            await self._device.set_temp_comfort(target_temp)
+        else:
+            await self._device.set_temp_comfort(target_temp)
+
         self._update()
 
     @property

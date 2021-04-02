@@ -14,11 +14,12 @@ from .api_const import (
     ERROR_INCORRECT_LOGIN_OR_PASSWORD,
 )
 from .exception import InvalidAuth, InvalidResponse, UserNotFound, DeviceUnavailable, EnexpectedError
+from .api_interface import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class RusclimatApi:
+class RusclimatApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
     def __init__(self, host: str, username: str, password: str, appcode: str):

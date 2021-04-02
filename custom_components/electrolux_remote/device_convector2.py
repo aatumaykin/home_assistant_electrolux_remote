@@ -2,27 +2,31 @@
 
 import logging
 
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 from .device_base import Device, State
-from .rusclimatapi import RusclimatApi
+from .api_interface import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
 
-PRESET_0 = 0
-PRESET_1 = 1
-PRESET_2 = 2
-PRESET_3 = 3
-PRESET_4 = 4
-PRESET_5 = 5
-PRESET_6 = 6
-PRESET_7 = 7
-
 DELTA_ECO_DEFAULT = 4
-TEMP_ANTIFROST_DEFAULT = 3
 
-TEMP_COMFORT_MIN = 10
-TEMP_COMFORT_MAX = 35
+TEMP_MIN = 10
+TEMP_MAX = 35
+
+TEMP_ANTIFROST_MIN = 3
+TEMP_ANTIFROST_MAX = 7
+
+
+class Preset(IntEnum):
+    PRESET_0 = 0
+    PRESET_1 = 1
+    PRESET_2 = 2
+    PRESET_3 = 3
+    PRESET_4 = 4
+    PRESET_5 = 5
+    PRESET_6 = 6
+    PRESET_7 = 7
 
 
 class BrightnessMode(IntEnum):
@@ -55,9 +59,10 @@ class WorkMode(IntEnum):
     NO_FROST = 2
     OFF = 3
 
+
 class Convector2(Device):
 
-    def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
+    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
         _LOGGER.debug("Convector2.init")
 
         super().__init__(uid, api)
@@ -68,23 +73,26 @@ class Convector2(Device):
         self._mute = State.OFF.value
         self._window_opened = State.OFF.value
         self._calendar_on = State.OFF.value
-        self._brightness = BrightnessMode.FULL.value
-        self._led_off_auto = LedMode.PERMANENT.value
-        self._temp_comfort = TEMP_COMFORT_MIN
-        self._delta_eco = DELTA_ECO_DEFAULT
-        self._temp_antifrost = TEMP_ANTIFROST_DEFAULT
-        self._mode = WorkMode.COMFORT.value
+        self._brightness = BrightnessMode.FULL.value    # яркость дисплея
+        self._led_off_auto = LedMode.PERMANENT.value    # автоотключение дисплея
+        self._temp_comfort = TEMP_MIN                   # температура для режима комфорт
+        self._delta_eco = DELTA_ECO_DEFAULT             # дельта для ночной температуры
+        self._temp_antifrost = TEMP_ANTIFROST_MIN       # температура для анти-фрост
+        self._mode = WorkMode.COMFORT.value             # режим работы
         self._mode_temp_1 = 0
         self._mode_temp_2 = 0
         self._mode_temp_3 = 0
+        # таймер
         self._hours = 0
         self._minutes = 0
         self._timer = State.OFF.value
+
         self._current_temp = 0
-        self._heat_mode = HeatMode.AUTO.value
-        self._power = PowerMode.POWER_0.value
+        self._heat_mode = HeatMode.AUTO.value   # режим обогрева: авто или ручной
+        self._power = PowerMode.POWER_0.value   # можность обогрева
         self._code = 0
         self._lcd_on = State.ON.value
+        # текущие дата и время
         self._time_seconds = 0
         self._time_minutes = 0
         self._time_hour = 0
@@ -92,13 +100,14 @@ class Convector2(Device):
         self._time_month = 0
         self._time_year = 0
         self._time_weekday = 0
-        self._preset_monday = PRESET_0
-        self._preset_tuesday = PRESET_0
-        self._preset_wednesday = PRESET_0
-        self._preset_thursday = PRESET_0
-        self._preset_friday = PRESET_0
-        self._preset_saturday = PRESET_0
-        self._preset_sunday = PRESET_0
+        # пресеты
+        self._preset_monday = Preset.PRESET_0.value
+        self._preset_tuesday = Preset.PRESET_0.value
+        self._preset_wednesday = Preset.PRESET_0.value
+        self._preset_thursday = Preset.PRESET_0.value
+        self._preset_friday = Preset.PRESET_0.value
+        self._preset_saturday = Preset.PRESET_0.value
+        self._preset_sunday = Preset.PRESET_0.value
         self._preset_day_1 = WorkMode.OFF.value
         self._preset_day_2 = WorkMode.OFF.value
         self._preset_day_3 = WorkMode.OFF.value
@@ -123,9 +132,10 @@ class Convector2(Device):
         self._preset_day_22 = WorkMode.OFF.value
         self._preset_day_23 = WorkMode.OFF.value
         self._preset_day_24 = WorkMode.OFF.value
+
         self._tempid = None
         self._mac = None
-        self._room = None
+        self._room = None   # название помещения
         self._sort = 0
         self._curr_slot = None
         self._active_slot = None
@@ -135,7 +145,7 @@ class Convector2(Device):
         self._wait_slot = None
         self._curr_slot_dropped = 0
         self._curr_scene_dropped = 0
-        self._lock = State.OFF.value
+        self._lock = State.OFF.value    # режим блокировки
 
         self._from_json(data)
 
@@ -206,7 +216,7 @@ class Convector2(Device):
             await self.update()
 
     async def set_mode(self, mode: WorkMode):
-        _LOGGER.debug(f"set_mode: {mode}")
+        _LOGGER.debug(f"set_mode: {mode.value}")
 
         if await self._api.set_device_param(self.uid, 'mode', mode.value):
             await self.update()
@@ -217,9 +227,6 @@ class Convector2(Device):
         if await self._api.set_device_param(self.uid, 'temp_comfort', value):
             await self.update()
 
-    @property
-    def state(self) -> bool:
-        return int(self._state) == State.ON.value
 
     @property
     def child_lock(self) -> bool:
@@ -262,8 +269,8 @@ class Convector2(Device):
         return float(self._current_temp)
 
     @property
-    def mode(self) -> int:
-        return int(self._mode)
+    def mode(self) -> WorkMode:
+        return WorkMode(int(self._mode))
 
     @property
     def temp_comfort(self) -> float:
@@ -364,3 +371,7 @@ class Convector2(Device):
     @property
     def lock(self) -> bool:
         return int(self._lock) == State.ON.value
+
+    @property
+    def room(self) -> str:
+        return self._room

@@ -15,6 +15,7 @@ from .convector2_to_climate import Convector2Climate
 from .thermostat_to_climate import Thermostat2Climate
 
 from .rusclimatapi import RusclimatApi
+from .test_api import TestApi
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry

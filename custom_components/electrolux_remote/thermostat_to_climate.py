@@ -2,8 +2,8 @@
 
 import logging
 
-from .device_thermostat import Thermostat, WorkMode
-from .rusclimatapi import RusclimatApi
+from .device_thermostat import Thermostat, WorkMode, TEMP_MIN, TEMP_MAX
+from .api_interface import ApiInterface
 
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
@@ -47,7 +47,7 @@ DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 class Thermostat2Climate(ClimateEntity):
     """Representation of an Climate."""
 
-    def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
+    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
         """Initialize"""
         _LOGGER.debug("Thermostat2Climate.init")
 
@@ -55,13 +55,14 @@ class Thermostat2Climate(ClimateEntity):
         self._device = Thermostat(uid, api, data)
         self._name = "thermostat" + self._device.uid
         self._uid = self._device.uid
-        self._min_temp = 0  # TEMP_COMFORT_MIN
-        self._max_temp = 40  # TEMP_COMFORT_MAX
+        self._min_temp = TEMP_MIN
+        self._max_temp = TEMP_MAX
         self._current_temp = None
         self._heating = False
         self._preset = None
-        self._target_temperature = None
+        self._target_temp = None
         self._available = False
+        self._name = None
 
         self._update()
 
@@ -73,10 +74,16 @@ class Thermostat2Climate(ClimateEntity):
         _LOGGER.debug("Thermostat2Climate.update")
 
         self._current_temp = self._device.floor_temp
-        self._heating = self._device.state == State.ON.value
-        self._preset = DEVICE_PRESET_TO_HA.get(WorkMode(self._device.mode))
-        self._available = self._device.online == State.ON.value
-        self._target_temperature = self._device.floor_temp_0
+        self._heating = self._device.state
+        self._preset = DEVICE_PRESET_TO_HA.get(self._device.mode)
+        self._available = self._device.online
+        self._target_temp = self._device.floor_temp_0
+        self._name = self._device.room
+
+    @property
+    def name(self):
+        """Return the name of the entity."""
+        return self._name
 
     @property
     def hvac_mode(self):
@@ -92,7 +99,6 @@ class Thermostat2Climate(ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-
         await self._device.set_state(not self._heating)
         self._update()
 
@@ -143,7 +149,7 @@ class Thermostat2Climate(ClimateEntity):
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
-        return self._target_temperature
+        return self._target_temp
 
     @property
     def preset_mode(self):
@@ -178,7 +184,7 @@ class Thermostat2Climate(ClimateEntity):
         if target_temp is None:
             return
 
-        await self._device.set_floor_temp_0(target_temp)
+        await self._device.set_floor_temp_0(target_temp * 10)
         self._update()
 
     @property

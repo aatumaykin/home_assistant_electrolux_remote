@@ -5,9 +5,12 @@ import logging
 from enum import Enum, IntEnum
 
 from .device_base import Device, State
-from .rusclimatapi import RusclimatApi
+from .api_interface import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
+
+TEMP_MIN = 0
+TEMP_MAX = 40
 
 
 class WorkMode(IntEnum):
@@ -19,18 +22,25 @@ class WorkMode(IntEnum):
     CALENDAR = 5
 
 
+class FloorCoverType(IntEnum):
+    TILE = 0
+    CARPET = 1
+    LAMINATE = 2
+    LINOLEUM = 3
+    PARQUET = 4
+
 class Thermostat(Device):
 
-    def __init__(self, uid: str, api: RusclimatApi, data: dict = None):
+    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
         _LOGGER.debug("Thermostat.init")
 
         super().__init__(uid, api)
 
         self._error = 0
         self._set_temp = 240
-        self._room_temp = 275
+        self._room_temp = 275  # комнатная температура
         self._set_room_temp = 38
-        self._floor_temp = 304
+        self._floor_temp = 304  # температура пола
         self._sensor_mode = 0
         self._sensor_type = 2
         self._floor_temp_limit = 450
@@ -38,10 +48,10 @@ class Thermostat(Device):
         self._led_light = None
         self._heating_on = None
         self._open_window = None
-        self._button_lock = None
-        self._pol_res_set = None
-        self._pol_type = None
-        self._mode = 0
+        self._button_lock = State.OFF   # блокировка кнопки
+        self._pol_res_set = State.OFF   # в приложении переменная называется firstSetUp
+        self._pol_type = FloorCoverType.TILE.value  # тип покрытия пола
+        self._mode = WorkMode.COMFORT.value  # режим работы
         self._pol_matrix = {}
         self._power_per_h = 0
         self._tariff_1 = 0
@@ -51,7 +61,7 @@ class Thermostat(Device):
         self._hours = 0
         self._minutes = 0
         self._mac = None
-        self._room = None
+        self._room = None   # название помещения
         self._sort = 0
         self._curr_slot = 0
         self._active_slot = 0
@@ -77,28 +87,36 @@ class Thermostat(Device):
         self._from_json(data)
 
     async def set_mode(self, mode: WorkMode):
-        _LOGGER.debug(f"set_mode: {mode}")
+        _LOGGER.debug(f"set_mode: {mode.value}")
 
-        # if await self._api.set_device_param(self.uid, 'mode', mode.value):
-        #     await self.update()
+        if await self._api.set_device_param(self.uid, 'mode', mode.value):
+            await self.update()
 
     async def set_floor_temp_0(self, value: int):
         _LOGGER.debug(f"set_floor_temp_0: {value}")
 
-        # if await self._api.set_device_param(self.uid, 'floor_temp_0', value):
-        #     await self.update()
-
-    @property
-    def state(self) -> bool:
-        return int(self._state) == State.ON.value
+        if await self._api.set_device_param(self.uid, 'floor_temp_0', value):
+            await self.update()
 
     @property
     def window_open(self) -> bool:
         return int(self._open_window) == State.ON.value
 
     @property
-    def mode(self) -> int:
-        return int(self._mode)
+    def button_lock(self) -> bool:
+        return int(self._button_lock) == State.ON.value
+
+    @property
+    def room(self) -> str:
+        return self._room
+
+    @property
+    def mode(self) -> WorkMode:
+        return WorkMode(int(self._mode))
+
+    @property
+    def pol_type(self) -> FloorCoverType:
+        return FloorCoverType(int(self._pol_type))
 
     @property
     def room_temp(self) -> float:
@@ -110,4 +128,4 @@ class Thermostat(Device):
 
     @property
     def floor_temp_0(self) -> float:
-        return float(self._floor_temp_0)
+        return float(self._floor_temp_0) / 10
