@@ -7,6 +7,13 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.split(".")[0] | int) < 1 %}
+## Version 0.0.2 (unreleased)
+
+### Features
+- добавлена заготовка для термостата
+- добавлены названия для устройств, если задано название помещения в приложении
+- рефакторинг
+
 ## [Version 0.0.1](https://github.com/Ailme/home_assistant_electrolux_remote/releases/tag/v0.0.1)
 
 ### Features
