@@ -184,7 +184,7 @@ class Thermostat2Climate(ClimateEntity):
         if target_temp is None:
             return
 
-        await self._device.set_floor_temp_0(target_temp * 10)
+        await self._device.set_temp(target_temp * 10)
         self._update()
 
     @property

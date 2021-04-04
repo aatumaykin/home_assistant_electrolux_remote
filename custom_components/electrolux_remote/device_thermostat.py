@@ -92,10 +92,10 @@ class Thermostat(Device):
         if await self._api.set_device_param(self.uid, 'mode', mode.value):
             await self.update()
 
-    async def set_floor_temp_0(self, value: int):
-        _LOGGER.debug(f"set_floor_temp_0: {value}")
+    async def set_temp(self, value: int):
+        _LOGGER.debug(f"set_temp: {value}")
 
-        if await self._api.set_device_param(self.uid, 'floor_temp_0', value):
+        if await self._api.set_device_param(self.uid, 'set_temp', value):
             await self.update()
 
     @property
