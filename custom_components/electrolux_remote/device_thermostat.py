@@ -29,6 +29,13 @@ class FloorCoverType(IntEnum):
     LINOLEUM = 3
     PARQUET = 4
 
+
+class FloorSensorMode(IntEnum):
+    FLOOR = 0
+    AIR = 1
+    FLOOR_AND_AIR = 2
+
+
 class Thermostat(Device):
 
     def __init__(self, uid: str, api: ApiInterface, data: dict = None):
@@ -37,12 +44,12 @@ class Thermostat(Device):
         super().__init__(uid, api)
 
         self._error = 0
-        self._set_temp = 240
+        self._set_temp = 240    # выставленная температура
         self._room_temp = 275  # комнатная температура
         self._set_room_temp = 38
         self._floor_temp = 304  # температура пола
         self._sensor_mode = 0
-        self._sensor_type = 2
+        self._sensor_type = FloorSensorMode.FLOOR_AND_AIR   # ?тип датчика
         self._floor_temp_limit = 450
         self._antifreeze_temp = 0
         self._led_light = None
@@ -92,7 +99,7 @@ class Thermostat(Device):
         if await self._api.set_device_param(self.uid, 'mode', mode.value):
             await self.update()
 
-    async def set_temp(self, value: int):
+    async def set_set_temp(self, value: int):
         _LOGGER.debug(f"set_temp: {value}")
 
         if await self._api.set_device_param(self.uid, 'set_temp', value):
@@ -129,3 +136,7 @@ class Thermostat(Device):
     @property
     def floor_temp_0(self) -> float:
         return float(self._floor_temp_0) / 10
+
+    @property
+    def set_temp(self) -> float:
+        return float(self._set_temp) / 10

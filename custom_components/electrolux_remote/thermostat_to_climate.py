@@ -77,7 +77,7 @@ class Thermostat2Climate(ClimateEntity):
         self._heating = self._device.state
         self._preset = DEVICE_PRESET_TO_HA.get(self._device.mode)
         self._available = self._device.online
-        self._target_temp = self._device.floor_temp_0
+        self._target_temp = self._device.set_temp
         self._name = self._device.room
 
     @property
@@ -184,7 +184,7 @@ class Thermostat2Climate(ClimateEntity):
         if target_temp is None:
             return
 
-        await self._device.set_temp(target_temp * 10)
+        await self._device.set_set_temp(target_temp * 10)
         self._update()
 
     @property
