@@ -50,7 +50,7 @@ Supported hvac modes:
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_AUTO]
+SUPPORT_MODES = [HVAC_MODE_HEAT]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_COMFORT: WorkMode.COMFORT,

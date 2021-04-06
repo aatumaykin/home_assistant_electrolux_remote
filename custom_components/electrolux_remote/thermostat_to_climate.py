@@ -56,12 +56,11 @@ SUPPORT_PRESETS = [
 """
 Supported hvac modes:
 - HVAC_MODE_HEAT: Heat to a target temperature (schedule off)
-- HVAC_MODE_AUTO: Follow the configured schedule
 - HVAC_MODE_OFF:  The device runs in a continuous energy savings mode. If
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_AUTO]
+SUPPORT_MODES = [HVAC_MODE_HEAT]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_CALENDAR: WorkMode.CALENDAR,
