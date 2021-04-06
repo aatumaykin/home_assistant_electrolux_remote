@@ -1,19 +1,48 @@
 # Electrolux remote device Component for Home Assistant
 
+[![GitHub Release][releases-shield]][releases]
+[![GitHub Activity][commits-shield]][commits]
+[![License][license-shield]](LICENSE)
+[![hacs][hacsbadge]][hacs]
+[![Project Maintenance][maintenance-shield]][user_profile]
+
+**This component will set up the following platforms.**
+
+| Platform        | Description                         |
+| --------------- | ----------------------------------- |
+| `climate`       | Add climate entity                  |
+
+{{ "{% if not installed %}" }}
+
+## Installation
+
+1. Click install.
+1. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Electrolux remote".
+
+{{ "{% endif %}" }}
+
 {%- if version_installed == "main" %}
 
 ## You are running main!
 
 This is **only** intended for development!
 
-{%- elif (version_installed.split(".")[0] | int) < 1 %}
-## Version 0.0.3(https://github.com/Ailme/home_assistant_electrolux_remote/releases/tag/v0.0.3)
+{%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 0.0.4
+
+### Changes
+- убрал пресет auto
+  
+### Fix
+- strings.json
+
+## Version 0.0.3
 
 ### Features
 - в Climate Entity добавлены атрибуты от термостата и конвектора
 - рефакторинг
 
-## Version 0.0.2 (https://github.com/Ailme/home_assistant_electrolux_remote/releases/tag/v0.0.2)
+## Version 0.0.2
 
 ### Features
 - добавлен минимальный функционал для термостата
@@ -46,3 +75,15 @@ This is **only** intended for development!
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-2.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-3.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-4.png?raw=true" width="250">
+
+---
+
+[commits-shield]: https://img.shields.io/github/commit-activity/y/Ailme/home_assistant_electrolux_remote.svg
+[commits]: https://github.com/Ailme/home_assistant_electrolux_remote/commits/main
+[hacs]: https://hacs.xyz
+[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg
+[license-shield]: https://img.shields.io/github/license/Ailme/home_assistant_electrolux_remote.svg
+[maintenance-shield]: https://img.shields.io/badge/maintainer-%40Ailme-blue.svg
+[releases-shield]: https://img.shields.io/github/release/Ailme/home_assistant_electrolux_remote.svg
+[releases]: https://github.com/Ailme/home_assistant_electrolux_remote/releases
+[user_profile]: https://github.com/Ailme
