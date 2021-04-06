@@ -17,3 +17,4 @@
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-2.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-3.png?raw=true" width="250">
+<img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-4.png?raw=true" width="250">

@@ -2,6 +2,12 @@
 Adds Support for Electrolux Convector
 
 Configuration for this platform:
+
+logger:
+  default: info
+  logs:
+    custom_components.electrolux_remote: debug
+
 climate:
   - platform: electrolux_remote
     name: Electrolux Convector
@@ -24,31 +30,34 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_devices):
+    """
+    Setup the climate platform
+    """
     _LOGGER.debug("climate.async_setup_entry")
 
     data = config_entry.options if config_entry.options != {} else config_entry.data
-
-    _LOGGER.debug("climate.async_setup_entry")
-
-    api = RusclimatApi(
-        host=data["host"],
-        username=data["username"],
-        password=data["password"],
-        appcode=data["appcode"],
-    )
-    json = await api.login()
-
     devices = []
-    for deviceData in json["result"]["device"]:
-        _LOGGER.debug(f"device: {deviceData}")
 
-        if deviceData["type"] == Convector2Climate.device_type():
-            device = Convector2Climate(deviceData["uid"], api, deviceData)
-            devices.append(device)
+    try:
+        api = TestApi(
+            host=data["host"],
+            username=data["username"],
+            password=data["password"],
+            appcode=data["appcode"],
+        )
+        json = await api.login()
 
-        if deviceData["type"] == Thermostat2Climate.device_type():
-            device = Thermostat2Climate(deviceData["uid"], api, deviceData)
-            devices.append(device)
+        for deviceData in json["result"]["device"]:
+            _LOGGER.debug(f"device: {deviceData}")
 
-    _LOGGER.debug(devices)
+            if deviceData["type"] == Convector2Climate.device_type():
+                device = Convector2Climate(deviceData["uid"], api, deviceData)
+                devices.append(device)
+
+            if deviceData["type"] == Thermostat2Climate.device_type():
+                device = Thermostat2Climate(deviceData["uid"], api, deviceData)
+                devices.append(device)
+    except Exception as err:
+        _LOGGER.error(err)
+
     async_add_devices(devices)

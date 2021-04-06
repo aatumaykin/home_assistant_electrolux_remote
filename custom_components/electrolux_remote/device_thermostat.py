@@ -30,10 +30,21 @@ class FloorCoverType(IntEnum):
     PARQUET = 4
 
 
+# датчик температуры
 class FloorSensorMode(IntEnum):
-    FLOOR = 0
-    AIR = 1
-    FLOOR_AND_AIR = 2
+    FLOOR = 0  # датчик пола
+    AIR = 1  # датчик воздуха
+    FLOOR_AND_AIR = 2  # датчик пола и воздуха
+
+
+# сопротивление датчика пола
+class FloorSensorType(IntEnum):
+    CALEO_5 = 0
+    TEPLOLUX_6 = 1
+    ELECTROLUX_10 = 2
+    RAYCHEM_13 = 3
+    DEVI_15 = 4
+    EBERLE_33 = 5
 
 
 class Thermostat(Device):
@@ -44,23 +55,23 @@ class Thermostat(Device):
         super().__init__(uid, api)
 
         self._error = 0
-        self._set_temp = 240    # выставленная температура
+        self._set_temp = 240  # выставленная температура
         self._room_temp = 275  # комнатная температура
         self._set_room_temp = 38
         self._floor_temp = 304  # температура пола
-        self._sensor_mode = 0
-        self._sensor_type = FloorSensorMode.FLOOR_AND_AIR   # ?тип датчика
+        self._sensor_mode = FloorSensorMode.FLOOR_AND_AIR  # датчик температуры
+        self._sensor_type = FloorSensorType.CALEO_5.value  # сопротивление датчика пола
         self._floor_temp_limit = 450
         self._antifreeze_temp = 0
-        self._led_light = None
-        self._heating_on = None
-        self._open_window = None
-        self._button_lock = State.OFF   # блокировка кнопки
-        self._pol_res_set = State.OFF   # в приложении переменная называется firstSetUp
+        self._led_light = None  # использование подсветки
+        self._heating_on = None  # нагрев
+        self._open_window = None    # открытое окно
+        self._button_lock = State.OFF  # блокировка ручного управления
+        self._pol_res_set = State.OFF  # в приложении переменная называется firstSetUp
         self._pol_type = FloorCoverType.TILE.value  # тип покрытия пола
         self._mode = WorkMode.COMFORT.value  # режим работы
         self._pol_matrix = {}
-        self._power_per_h = 0
+        self._power_per_h = 0   # потребление
         self._tariff_1 = 0
         self._tariff_2 = 0
         self._tariff_3 = 0
@@ -68,7 +79,7 @@ class Thermostat(Device):
         self._hours = 0
         self._minutes = 0
         self._mac = None
-        self._room = None   # название помещения
+        self._room = None  # название помещения
         self._sort = 0
         self._curr_slot = 0
         self._active_slot = 0
@@ -106,7 +117,7 @@ class Thermostat(Device):
             await self.update()
 
     @property
-    def window_open(self) -> bool:
+    def open_window(self) -> bool:
         return int(self._open_window) == State.ON.value
 
     @property
@@ -140,3 +151,39 @@ class Thermostat(Device):
     @property
     def set_temp(self) -> float:
         return float(self._set_temp) / 10
+
+    @property
+    def power_per_h(self) -> float:
+        return float(self._power_per_h)
+
+    @property
+    def antifreeze_temp(self) -> float:
+        return float(self._antifreeze_temp)
+
+    @property
+    def tariff_1(self) -> float:
+        return float(self._tariff_1)
+
+    @property
+    def tariff_2(self) -> float:
+        return float(self._tariff_2)
+
+    @property
+    def tariff_3(self) -> float:
+        return float(self._tariff_3)
+
+    @property
+    def sensor_mode(self) -> FloorSensorMode:
+        return FloorSensorMode(int(self._sensor_mode))
+
+    @property
+    def sensor_type(self) -> FloorSensorType:
+        return FloorSensorType(int(self._sensor_type))
+
+    @property
+    def heating_on(self) -> bool:
+        return self._heating_on == State.ON.value
+
+    @property
+    def led_light(self) -> bool:
+        return self._led_light == State.ON.value

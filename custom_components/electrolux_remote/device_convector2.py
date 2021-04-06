@@ -60,6 +60,11 @@ class WorkMode(IntEnum):
     OFF = 3
 
 
+BRIGHTNESS = {
+    BrightnessMode.HALF: "50%",
+    BrightnessMode.FULL: "100%",
+}
+
 class Convector2(Device):
 
     def __init__(self, uid: str, api: ApiInterface, data: dict = None):
@@ -233,6 +238,14 @@ class Convector2(Device):
         return int(self._child_lock) == State.ON.value
 
     @property
+    def sensor_fault(self) -> bool:
+        return int(self._sensor_fault) == State.ON.value
+
+    @property
+    def lcd_on(self) -> bool:
+        return int(self._lcd_on) == State.ON.value
+
+    @property
     def window_open(self) -> bool:
         return int(self._window_open) == State.ON.value
 
@@ -367,6 +380,130 @@ class Convector2(Device):
     @property
     def sort(self) -> int:
         return int(self._sort)
+
+    @property
+    def preset_monday(self) -> int:
+        return int(self._preset_monday)
+
+    @property
+    def preset_tuesday(self) -> int:
+        return int(self._preset_tuesday)
+
+    @property
+    def preset_wednesday(self) -> int:
+        return int(self._preset_wednesday)
+
+    @property
+    def preset_thursday(self) -> int:
+        return int(self._preset_thursday)
+
+    @property
+    def preset_friday(self) -> int:
+        return int(self._preset_friday)
+
+    @property
+    def preset_saturday(self) -> int:
+        return int(self._preset_saturday)
+
+    @property
+    def preset_sunday(self) -> int:
+        return int(self._preset_sunday)
+
+    @property
+    def preset_day_1(self) -> int:
+        return int(self._preset_day_1)
+
+    @property
+    def preset_day_2(self) -> int:
+        return int(self._preset_day_2)
+
+    @property
+    def preset_day_3(self) -> int:
+        return int(self._preset_day_3)
+
+    @property
+    def preset_day_4(self) -> int:
+        return int(self._preset_day_4)
+
+    @property
+    def preset_day_5(self) -> int:
+        return int(self._preset_day_5)
+
+    @property
+    def preset_day_6(self) -> int:
+        return int(self._preset_day_6)
+
+    @property
+    def preset_day_7(self) -> int:
+        return int(self._preset_day_7)
+
+    @property
+    def preset_day_8(self) -> int:
+        return int(self._preset_day_8)
+
+    @property
+    def preset_day_9(self) -> int:
+        return int(self._preset_day_9)
+
+    @property
+    def preset_day_10(self) -> int:
+        return int(self._preset_day_10)
+
+    @property
+    def preset_day_11(self) -> int:
+        return int(self._preset_day_11)
+
+    @property
+    def preset_day_12(self) -> int:
+        return int(self._preset_day_12)
+
+    @property
+    def preset_day_13(self) -> int:
+        return int(self._preset_day_13)
+
+    @property
+    def preset_day_14(self) -> int:
+        return int(self._preset_day_14)
+
+    @property
+    def preset_day_15(self) -> int:
+        return int(self._preset_day_15)
+
+    @property
+    def preset_day_16(self) -> int:
+        return int(self._preset_day_16)
+
+    @property
+    def preset_day_17(self) -> int:
+        return int(self._preset_day_17)
+
+    @property
+    def preset_day_18(self) -> int:
+        return int(self._preset_day_18)
+
+    @property
+    def preset_day_19(self) -> int:
+        return int(self._preset_day_19)
+
+    @property
+    def preset_day_20(self) -> int:
+        return int(self._preset_day_20)
+
+    @property
+    def preset_day_21(self) -> int:
+        return int(self._preset_day_21)
+
+    @property
+    def preset_day_22(self) -> int:
+        return int(self._preset_day_22)
+
+    @property
+    def preset_day_23(self) -> int:
+        return int(self._preset_day_23)
+
+    @property
+    def preset_day_24(self) -> int:
+        return int(self._preset_day_24)
 
     @property
     def lock(self) -> bool:

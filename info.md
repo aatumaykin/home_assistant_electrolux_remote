@@ -7,7 +7,13 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.split(".")[0] | int) < 1 %}
-## Version 0.0.2 (unreleased)
+## Version 0.0.3(https://github.com/Ailme/home_assistant_electrolux_remote/releases/tag/v0.0.3)
+
+### Features
+- в Climate Entity добавлены атрибуты от термостата и конвектора
+- рефакторинг
+
+## Version 0.0.2 (https://github.com/Ailme/home_assistant_electrolux_remote/releases/tag/v0.0.2)
 
 ### Features
 - добавлен минимальный функционал для термостата
@@ -39,3 +45,4 @@ This is **only** intended for development!
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-2.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-3.png?raw=true" width="250">
+<img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-4.png?raw=true" width="250">
