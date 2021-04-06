@@ -1,7 +1,7 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Интеграция уже настроена"
     },
     "error": {
       "cannot_connect": "Failed to connect",
@@ -12,8 +12,8 @@
       "user": {
         "data": {
           "host": "Host",
-          "password": "Password",
-          "username": "Username",
+          "password": "Пароль",
+          "username": "Телефон",
           "appcode": "appcode"
         }
       }
@@ -23,10 +23,10 @@
   "state": {
     "_": {
       "no_frost": "Anti Frost",
-      "calendar": "Calendar",
-      "manual": "Manual",
-      "forsage": "Forsage",
-      "vacation": "Vacation"
+      "calendar": "Календарь",
+      "manual": "Вручную",
+      "forsage": "Форсаж",
+      "vacation": "Отпуск"
     }
   }
 }

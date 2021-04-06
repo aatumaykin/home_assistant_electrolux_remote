@@ -1,6 +1,5 @@
 {
   "title": "Electrolux Remote",
-  "no_frost": "Anti Frost",
   "config": {
     "step": {
       "user": {
@@ -19,6 +18,15 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "state": {
+    "_": {
+      "no_frost": "Anti Frost",
+      "calendar": "Calendar",
+      "manual": "Manual",
+      "forsage": "Forsage",
+      "vacation": "Vacation"
     }
   }
 }
