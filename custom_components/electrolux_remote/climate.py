@@ -39,7 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     devices = []
 
     try:
-        api = TestApi(
+        api = RusclimatApi(
             host=data["host"],
             username=data["username"],
             password=data["password"],
