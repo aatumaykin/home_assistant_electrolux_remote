@@ -63,8 +63,6 @@ class RusclimatApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
     def __init__(self, host: str, username: str, password: str, appcode: str, session: ClientSession):
-        _LOGGER.debug("RusclimatApi.init")
-
         self._host = host
         self._username = username
         self._password = password
@@ -195,8 +193,6 @@ class TestApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
     def __init__(self, host: str, username: str, password: str, appcode: str):
-        _LOGGER.debug("TestApi.init")
-
         self.devices = [
             {
                 "tempid": "181304",

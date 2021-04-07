@@ -7,7 +7,10 @@ import asyncio
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from .const import DOMAIN, PLATFORMS, HOST_RUSKLIMAT
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
+
+from .const import DOMAIN, PLATFORMS, HOST_RUSKLIMAT, STARTUP_MESSAGE, CONF_APPCODE
 from .api import RusclimatApi
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,18 +18,25 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Electrolux component."""
-    _LOGGER.info("Set up of integration %s", DOMAIN)
-
-    hass.data.setdefault(DOMAIN, {})
-
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up from a config entry."""
-    _LOGGER.debug("init.async_setup_entry")
+    """Set up this integration using UI."""
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
+        _LOGGER.info(STARTUP_MESSAGE)
 
-    # hass.data[DOMAIN][entry.entry_id] = RusclimatApi(entry.data["host"])
+    # Store an instance of the "connecting" class that does the work of speaking
+    # with your actual devices.
+    session = async_get_clientsession(hass)
+    hass.data[DOMAIN][entry.entry_id] = RusclimatApi(
+        entry.data.get(CONF_HOST),
+        entry.data.get(CONF_USERNAME),
+        entry.data.get(CONF_USERNAME),
+        entry.data.get(CONF_USERNAME),
+        session
+    )
 
     for platform in PLATFORMS:
         _LOGGER.info("Added new platform: %s, entry_id: %s", entry.title, entry.entry_id)
@@ -40,8 +50,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
-    _LOGGER.debug("init.async_unload_entry")
-
     unload_ok = all(
         await asyncio.gather(
             *[
