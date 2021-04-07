@@ -1,10 +1,180 @@
-"""Test Api"""
+"""Adds Support for Rusclimat"""
 
 import logging
+import abc
 
-from .api_interface import ApiInterface
+from aiohttp import ClientSession
+
+from .const import LANG
+from .exception import InvalidAuth, InvalidResponse, UserNotFound, DeviceUnavailable, EnexpectedError
 
 _LOGGER = logging.getLogger(__name__)
+
+# request uri
+API_LOGIN = "api/userAuth"
+API_CHANGE_PASSWORD = "api/userChangePassword"
+API_CREATE_CALENDAR = "api/setTimeSlot"
+API_DELETE_DEVICE = "api/deleteDevice"
+API_DELETE_DEVICE_BY_TEMP_ID = "api/deleteDeviceByTempID"
+API_PUT_DEVICE = "api/putDevice"
+API_GET_DEVICE_PARAMS = "api/getDeviceParams"
+API_SET_DEVICE_PARAMS = "api/setDeviceParams"
+API_REGISTRATION = "api/userRegister"
+API_REMIND_PASSWORD = "api/userRemindPassword"
+API_SEND_CODE = "api/userRegister"
+API_UPDATE_CALENDAR_SLOTS = "api/setTimeSlot"
+
+# response code
+ERROR_INCORRECT_LOGIN_OR_PASSWORD = "106"
+ERROR_INCORRECT_PHONE = "112"               # Слишком короткий номер телефона
+ERROR_TOKEN_NOT_FOUND = "121"               # Токен не найден
+ERROR_USER_NOT_FOUND = "136"                # Пользователь не найден
+ERROR_DEVICE_UNAVAILABLE = "153"            # Ошибка - устройство не в сети или неизвестный тип
+
+HEADERS = {
+    "lang": LANG,
+    "Content-Type": "application/json; charset=UTF-8",
+    "Connection": "Keep-Alive",
+    "Accept-Encoding": "gzip",
+    "User-Agent": "okhttp/4.3.1",
+}
+
+
+class ApiInterface(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    async def login(self) -> []:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def get_device_params(self, uid: str) -> []:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def set_device_param(self, uid: str, param: str, value) -> bool:
+        raise NotImplementedError
+
+
+class RusclimatApi(ApiInterface):
+    """ Wrapper class to the Rusclimat API """
+
+    def __init__(self, host: str, username: str, password: str, appcode: str):
+        _LOGGER.debug("RusclimatApi.init")
+
+        self._host = host
+        self._username = username
+        self._password = password
+        self._appcode = appcode
+        self._token = None
+        self.session = None
+
+    def __del__(self):
+        _LOGGER.debug('RusclimatApi.destructor')
+        # try:
+        #     await self.session.close()
+        # except Exception:
+        #     pass
+
+    def _create_session(self):
+        _LOGGER.debug('RusclimatApi._create_session')
+        self.session = ClientSession()
+
+    async def _request(self, url: str, payload: dict) -> dict:
+        if self.session is None or self.session.closed:
+            self._create_session()
+
+        _LOGGER.debug(f"request: {url}")
+        _LOGGER.debug(f"payload: {payload}")
+
+        resp = await self.session.post(f"{self._host}/{url}", json=payload, headers=HEADERS)
+        json = await resp.json()
+
+        _LOGGER.debug(f"response: {json}")
+
+        if json is None:
+            raise InvalidResponse(f"Response error: json is None")
+
+        return json
+
+    async def login(self) -> []:
+        """Auth on server"""
+
+        payload = {
+            "login": self._username,
+            "password": self._password,
+            "appcode": self._appcode
+        }
+
+        json = await self._request(API_LOGIN, payload)
+
+        if json["error_code"] == ERROR_USER_NOT_FOUND:
+            raise UserNotFound(json["error_message"])
+        elif json["error_code"] == ERROR_INCORRECT_LOGIN_OR_PASSWORD:
+            raise InvalidAuth(json["error_message"])
+        elif json["error_code"] != "0":
+            _LOGGER.exception(f"message: '{json['error_message']}'; code: {json['error_code']}")
+            raise InvalidAuth(json["error_message"])
+
+        self._token = json["result"]["token"]
+
+        return json
+
+    async def _update_device_params(self, params: dict) -> dict:
+        if self._token is None:
+            await self.login()
+
+        payload = {
+            "token": self._token,
+            "device": [params]
+        }
+
+        json = await self._request(API_SET_DEVICE_PARAMS, payload)
+
+        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
+            raise DeviceUnavailable(json["error_message"])
+
+        self._check_response_code(json)
+
+        return json
+
+    async def get_device_params(self, uid: str) -> []:
+        if self._token is None:
+            await self.login()
+
+        payload = {
+            "token": self._token,
+            "uid": [uid]
+        }
+
+        json = await self._request(API_GET_DEVICE_PARAMS, payload)
+
+        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
+            raise DeviceUnavailable(json["error_message"])
+
+        self._check_response_code(json)
+
+        return json["result"]["device"]
+
+    async def set_device_param(self, uid: str, param: str, value) -> bool:
+        payload = {
+            "uid": uid,
+            "params": {
+                param: value
+            }
+        }
+
+        json = await self._update_device_params(payload)
+
+        return self._check_result(json)
+
+    @staticmethod
+    def _check_response_code(json):
+        if json["error_code"] != "0":
+            _LOGGER.exception(f"message: '{json['error_message']}'; code: {json['error_code']}")
+            raise EnexpectedError(json["error_message"])
+
+    @staticmethod
+    def _check_result(json) -> bool:
+        return json["result"] == "1"
 
 
 class TestApi(ApiInterface):
@@ -213,7 +383,7 @@ class TestApi(ApiInterface):
              'online': '1', 'lock': '0'}
         ]
 
-    async def login(self):
+    async def login(self) -> []:
         json = {
             'result': {
                 'token': '123456',
@@ -223,9 +393,9 @@ class TestApi(ApiInterface):
             'error_message': ''
         }
 
-        return json
+        return json["result"]["device"]
 
-    async def get_device_params(self, uid: str):
+    async def get_device_params(self, uid: str) -> []:
         return self.devices
 
     async def set_device_param(self, uid: str, param: str, value) -> bool:

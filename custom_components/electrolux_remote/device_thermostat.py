@@ -5,7 +5,7 @@ import logging
 from enum import Enum, IntEnum
 
 from .device_base import Device, State
-from .api_interface import ApiInterface
+from .api import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
 

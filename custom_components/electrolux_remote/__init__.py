@@ -8,7 +8,7 @@ import asyncio
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, PLATFORMS, HOST_RUSKLIMAT
-from .rusclimatapi import RusclimatApi
+from .api import RusclimatApi
 
 _LOGGER = logging.getLogger(__name__)
 

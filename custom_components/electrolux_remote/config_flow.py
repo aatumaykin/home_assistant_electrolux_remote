@@ -8,7 +8,7 @@ from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 
 from .const import DOMAIN, HOST_RUSKLIMAT, APPCODE_ELECTROLUX
 from .exception import InvalidHost, CannotConnect, InvalidAuth, UserNotFound
-from .rusclimatapi import RusclimatApi
+from .api import RusclimatApi
 
 _LOGGER = logging.getLogger(__name__)
 

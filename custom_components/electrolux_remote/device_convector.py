@@ -3,7 +3,7 @@
 import logging
 
 from .device_base import Device
-from .rusclimatapi import RusclimatApi
+from .api import RusclimatApi
 from .const import *
 from .enum import *
 

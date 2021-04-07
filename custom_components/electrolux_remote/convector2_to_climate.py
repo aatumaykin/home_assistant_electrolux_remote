@@ -15,14 +15,13 @@ from .device_convector2 import (
     BRIGHTNESS
 )
 
-from .api_interface import ApiInterface
+from .api import ApiInterface
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
     SUPPORT_PRESET_MODE,
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
-    HVAC_MODE_AUTO,
     CURRENT_HVAC_HEAT,
     CURRENT_HVAC_IDLE,
     PRESET_COMFORT,

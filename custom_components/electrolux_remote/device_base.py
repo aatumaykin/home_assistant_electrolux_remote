@@ -3,7 +3,7 @@
 import logging
 
 from enum import IntEnum
-from .api_interface import ApiInterface
+from .api import ApiInterface
 
 _LOGGER = logging.getLogger(__name__)
 
