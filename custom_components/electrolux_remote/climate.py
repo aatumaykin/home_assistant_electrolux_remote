@@ -24,6 +24,7 @@ from .api import RusclimatApi, TestApi
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,11 +39,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     devices = []
 
     try:
+        session = async_create_clientsession(hass)
         api = RusclimatApi(
-            host=data["host"],
-            username=data["username"],
-            password=data["password"],
-            appcode=data["appcode"],
+            data["host"],
+            data["username"],
+            data["password"],
+            data["appcode"],
+            session
         )
         json = await api.login()
 

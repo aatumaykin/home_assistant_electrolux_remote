@@ -2,8 +2,11 @@
 
 import logging
 import abc
+import async_timeout
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientError
+from asyncio import TimeoutError, get_event_loop
+from socket import gaierror
 
 from .const import LANG
 from .exception import InvalidAuth, InvalidResponse, UserNotFound, DeviceUnavailable, EnexpectedError
@@ -39,6 +42,8 @@ HEADERS = {
     "User-Agent": "okhttp/4.3.1",
 }
 
+TIMEOUT = 10
+
 
 class ApiInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -57,7 +62,7 @@ class ApiInterface(metaclass=abc.ABCMeta):
 class RusclimatApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
-    def __init__(self, host: str, username: str, password: str, appcode: str):
+    def __init__(self, host: str, username: str, password: str, appcode: str, session: ClientSession):
         _LOGGER.debug("RusclimatApi.init")
 
         self._host = host
@@ -65,35 +70,44 @@ class RusclimatApi(ApiInterface):
         self._password = password
         self._appcode = appcode
         self._token = None
-        self.session = None
-
-    def __del__(self):
-        _LOGGER.debug('RusclimatApi.destructor')
-        # try:
-        #     await self.session.close()
-        # except Exception:
-        #     pass
-
-    def _create_session(self):
-        _LOGGER.debug('RusclimatApi._create_session')
-        self.session = ClientSession()
+        self._session = session
 
     async def _request(self, url: str, payload: dict) -> dict:
-        if self.session is None or self.session.closed:
-            self._create_session()
-
         _LOGGER.debug(f"request: {url}")
         _LOGGER.debug(f"payload: {payload}")
 
-        resp = await self.session.post(f"{self._host}/{url}", json=payload, headers=HEADERS)
-        json = await resp.json()
+        try:
+            async with async_timeout.timeout(TIMEOUT, loop=get_event_loop()):
+                response = await self._session.post(f"{self._host}/{url}", json=payload, headers=HEADERS)
+                json = await response.json()
 
-        _LOGGER.debug(f"response: {json}")
+                _LOGGER.debug(f"response: {json}")
 
-        if json is None:
-            raise InvalidResponse(f"Response error: json is None")
+                if json is None:
+                    raise InvalidResponse(f"Response error: json is None")
 
-        return json
+                return json
+        except TimeoutError as exception:
+            _LOGGER.error(
+                "Timeout error fetching information from %s - %s",
+                url,
+                exception,
+            )
+
+        except (KeyError, TypeError) as exception:
+            _LOGGER.error(
+                "Error parsing information from %s - %s",
+                url,
+                exception,
+            )
+        except (ClientError, gaierror) as exception:
+            _LOGGER.error(
+                "Error fetching information from %s - %s",
+                url,
+                exception,
+            )
+        except Exception as exception:  # pylint: disable=broad-except
+            _LOGGER.error("Something really wrong happened! - %s", exception)
 
     async def login(self) -> []:
         """Auth on server"""

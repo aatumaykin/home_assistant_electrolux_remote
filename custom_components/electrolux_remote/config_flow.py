@@ -5,6 +5,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries, core
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from .const import DOMAIN, HOST_RUSKLIMAT, APPCODE_ELECTROLUX
 from .exception import InvalidHost, CannotConnect, InvalidAuth, UserNotFound
@@ -25,11 +26,13 @@ async def validate_input(hass: core.HomeAssistant, data: dict):
     if len(data["host"]) < 3:
         raise InvalidHost
 
+    session = async_create_clientsession(hass)
     api = RusclimatApi(
-        host=data["host"],
-        username=data["username"],
-        password=data["password"],
-        appcode=data["appcode"],
+        data["host"],
+        data["username"],
+        data["password"],
+        data["appcode"],
+        session
     )
     await api.login()
 
