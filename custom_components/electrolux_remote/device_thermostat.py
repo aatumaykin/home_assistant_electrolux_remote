@@ -50,8 +50,6 @@ class FloorSensorType(IntEnum):
 class Thermostat(Device):
 
     def __init__(self, uid: str, api: ApiInterface, data: dict = None):
-        _LOGGER.debug("Thermostat.init")
-
         super().__init__(uid, api)
 
         self._error = 0

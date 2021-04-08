@@ -68,8 +68,6 @@ class Convector2Climate(ClimateBase):
         """
         Initialize the climate device
         """
-        _LOGGER.debug("Convector2Climate.init")
-
         super().__init__(
             uid=uid,
             name=DEFAULT_NAME + uid,

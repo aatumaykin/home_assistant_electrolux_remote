@@ -68,8 +68,6 @@ BRIGHTNESS = {
 class Convector2(Device):
 
     def __init__(self, uid: str, api: ApiInterface, data: dict = None):
-        _LOGGER.debug("Convector2.init")
-
         super().__init__(uid, api)
 
         self._child_lock = State.OFF.value

@@ -33,8 +33,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][entry.entry_id] = RusclimatApi(
         entry.data.get(CONF_HOST),
         entry.data.get(CONF_USERNAME),
-        entry.data.get(CONF_USERNAME),
-        entry.data.get(CONF_USERNAME),
+        entry.data.get(CONF_PASSWORD),
+        entry.data.get(CONF_APPCODE),
         session
     )
 

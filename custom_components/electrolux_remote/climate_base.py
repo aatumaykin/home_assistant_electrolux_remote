@@ -31,8 +31,6 @@ class ClimateBase(ClimateEntity):
         """
         Initialize the climate device
         """
-        _LOGGER.debug("ClimateBase.init")
-
         self._icon = "mdi:radiator"
         self._uid = uid
         self._name = name

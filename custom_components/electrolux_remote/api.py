@@ -51,6 +51,10 @@ class ApiInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def get_data(self) -> []:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def get_device_params(self, uid: str) -> []:
         raise NotImplementedError
 
@@ -69,6 +73,77 @@ class RusclimatApi(ApiInterface):
         self._appcode = appcode
         self._token = None
         self._session = session
+
+    async def login(self) -> []:
+        """Auth on server"""
+
+        payload = {
+            "login": self._username,
+            "password": self._password,
+            "appcode": self._appcode
+        }
+
+        json = await self._request(API_LOGIN, payload)
+
+        if json["error_code"] == ERROR_USER_NOT_FOUND:
+            raise UserNotFound(json["error_message"])
+        elif json["error_code"] == ERROR_INCORRECT_LOGIN_OR_PASSWORD:
+            raise InvalidAuth(json["error_message"])
+        elif json["error_code"] != "0":
+            _LOGGER.exception(f"message: '{json['error_message']}'; code: {json['error_code']}")
+            raise InvalidAuth(json["error_message"])
+
+        self._token = json["result"]["token"]
+
+        return json
+
+    async def get_device_params(self, uid: str) -> []:
+        if self._token is None:
+            await self.login()
+
+        payload = {
+            "token": self._token,
+            "uid": [uid]
+        }
+
+        json = await self._request(API_GET_DEVICE_PARAMS, payload)
+
+        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
+            raise DeviceUnavailable(json["error_message"])
+
+        self._check_response_code(json)
+
+        return json["result"]["device"]
+
+    async def get_data(self) -> []:
+        if self._token is None:
+            await self.login()
+
+        payload = {
+            "token": self._token,
+            "uid": []
+        }
+
+        json = await self._request(API_GET_DEVICE_PARAMS, payload)
+
+        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
+            raise DeviceUnavailable(json["error_message"])
+
+        self._check_response_code(json)
+
+        return json["result"]["device"]
+
+    async def set_device_param(self, uid: str, param: str, value) -> bool:
+        payload = {
+            "uid": uid,
+            "params": {
+                param: value
+            }
+        }
+
+        json = await self._update_device_params(payload)
+
+        return self._check_result(json)
 
     async def _request(self, url: str, payload: dict) -> dict:
         _LOGGER.debug(f"request: {url}")
@@ -107,29 +182,6 @@ class RusclimatApi(ApiInterface):
         except Exception as exception:  # pylint: disable=broad-except
             _LOGGER.error("Something really wrong happened! - %s", exception)
 
-    async def login(self) -> []:
-        """Auth on server"""
-
-        payload = {
-            "login": self._username,
-            "password": self._password,
-            "appcode": self._appcode
-        }
-
-        json = await self._request(API_LOGIN, payload)
-
-        if json["error_code"] == ERROR_USER_NOT_FOUND:
-            raise UserNotFound(json["error_message"])
-        elif json["error_code"] == ERROR_INCORRECT_LOGIN_OR_PASSWORD:
-            raise InvalidAuth(json["error_message"])
-        elif json["error_code"] != "0":
-            _LOGGER.exception(f"message: '{json['error_message']}'; code: {json['error_code']}")
-            raise InvalidAuth(json["error_message"])
-
-        self._token = json["result"]["token"]
-
-        return json
-
     async def _update_device_params(self, params: dict) -> dict:
         if self._token is None:
             await self.login()
@@ -147,36 +199,6 @@ class RusclimatApi(ApiInterface):
         self._check_response_code(json)
 
         return json
-
-    async def get_device_params(self, uid: str) -> []:
-        if self._token is None:
-            await self.login()
-
-        payload = {
-            "token": self._token,
-            "uid": [uid]
-        }
-
-        json = await self._request(API_GET_DEVICE_PARAMS, payload)
-
-        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
-            raise DeviceUnavailable(json["error_message"])
-
-        self._check_response_code(json)
-
-        return json["result"]["device"]
-
-    async def set_device_param(self, uid: str, param: str, value) -> bool:
-        payload = {
-            "uid": uid,
-            "params": {
-                param: value
-            }
-        }
-
-        json = await self._update_device_params(payload)
-
-        return self._check_result(json)
 
     @staticmethod
     def _check_response_code(json):
@@ -404,6 +426,9 @@ class TestApi(ApiInterface):
         }
 
         return json["result"]["device"]
+
+    async def get_data(self) -> []:
+        return self.devices
 
     async def get_device_params(self, uid: str) -> []:
         return self.devices
