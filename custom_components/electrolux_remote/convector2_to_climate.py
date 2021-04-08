@@ -82,7 +82,6 @@ class Convector2Climate(ClimateBase):
         coordinator.async_add_listener(self._update)
 
         self._device = Convector2()
-        self._uid = uid
         self._hvac_mode = HVAC_MODE_OFF
 
         self._update()
@@ -98,8 +97,6 @@ class Convector2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        _LOGGER.debug(f"hvac_mode: {hvac_mode}")
-
         if hvac_mode == HVAC_MODE_AUTO:
             params = {}
 

@@ -2,15 +2,17 @@
 
 import logging
 
-from enum import Enum, IntEnum
-
-from .device_base import Device, State
-from .api import ApiInterface
+from enum import IntEnum
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 0
 TEMP_MAX = 40
+
+
+class State(IntEnum):
+    OFF = 0
+    ON = 1
 
 
 class WorkMode(IntEnum):
@@ -47,11 +49,10 @@ class FloorSensorType(IntEnum):
     EBERLE_33 = 5
 
 
-class Thermostat(Device):
-
-    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
-        super().__init__(uid, api)
-
+class Thermostat:
+    def __init__(self):
+        self._state = State.OFF.value
+        self._online = State.OFF.value
         self._error = 0
         self._set_temp = 240  # выставленная температура
         self._room_temp = 275  # комнатная температура
@@ -100,19 +101,10 @@ class Thermostat(Device):
         self._antifreeze_temp_1 = 0
         self._antifreeze_temp_0 = 0
 
-        self._from_json(data)
-
-    async def set_mode(self, mode: WorkMode):
-        _LOGGER.debug(f"set_mode: {mode.value}")
-
-        if await self._api.set_device_param(self.uid, 'mode', mode.value):
-            await self.update()
-
-    async def set_set_temp(self, value: int):
-        _LOGGER.debug(f"set_temp: {value}")
-
-        if await self._api.set_device_param(self.uid, 'set_temp', value):
-            await self.update()
+    def from_json(self, data: dict):
+        """Fill self from json data"""
+        for key in data:
+            setattr(self, f"_{key}", data[key])
 
     @property
     def open_window(self) -> bool:
@@ -185,3 +177,11 @@ class Thermostat(Device):
     @property
     def led_light(self) -> bool:
         return self._led_light == State.ON.value
+
+    @property
+    def state(self) -> bool:
+        return int(self._state) == State.ON.value
+
+    @property
+    def online(self) -> bool:
+        return int(self._online) == State.ON.value

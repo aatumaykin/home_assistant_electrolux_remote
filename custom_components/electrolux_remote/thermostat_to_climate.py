@@ -8,6 +8,7 @@ from .climate_base import ClimateBase
 from .device_thermostat import (
     Thermostat,
     WorkMode,
+    State,
     TEMP_MIN,
     TEMP_MAX,
 )
@@ -58,12 +59,12 @@ Supported hvac modes:
 SUPPORT_MODES = [HVAC_MODE_HEAT]
 
 HA_PRESET_TO_DEVICE = {
-    PRESET_CALENDAR: WorkMode.CALENDAR,
-    PRESET_MANUAL: WorkMode.MANUAL,
-    PRESET_COMFORT: WorkMode.COMFORT,
-    PRESET_ECO: WorkMode.ECO,
-    PRESET_FORSAGE: WorkMode.FORSAGE,
-    PRESET_VACATION: WorkMode.VACATION,
+    PRESET_CALENDAR: WorkMode.CALENDAR.value,
+    PRESET_MANUAL: WorkMode.MANUAL.value,
+    PRESET_COMFORT: WorkMode.COMFORT.value,
+    PRESET_ECO: WorkMode.ECO.value,
+    PRESET_FORSAGE: WorkMode.FORSAGE.value,
+    PRESET_VACATION: WorkMode.VACATION.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
@@ -75,16 +76,14 @@ class Thermostat2Climate(ClimateBase):
     Representation of a climate device
     """
 
-    def __init__(self, uid: str, coordinator: Coordinator, data: Optional[dict] = None):
+    def __init__(self, uid: str, coordinator: Coordinator):
         """
         Initialize the climate device
         """
-        _LOGGER.debug("Thermostat2Climate.init")
-
         super().__init__(
             coordinator=coordinator,
             uid=uid,
-            name=DEFAULT_NAME + uid,
+            name=f"{DEFAULT_NAME} {uid}",
             temp_min=TEMP_MIN,
             temp_max=TEMP_MAX,
             support_flags=SUPPORT_FLAGS,
@@ -93,22 +92,10 @@ class Thermostat2Climate(ClimateBase):
         )
 
         self.coordinator = coordinator
-        self._device = Thermostat(uid, coordinator.api, data)
-        self._heating = None
-        self._room_temp = None  # комнатная температура
-        self._floor_temp = None  # температура пола
-        self._sensor_mode = None  # датчик температуры
-        self._sensor_type = None  # сопротивление датчика пола
-        self._button_lock = None  # блокировка ручного управления
-        self._floor_cover_type = None  # тип покрытия пола
-        self._open_window = None  # открытое окно
-        self._heating_on = None   # нагрев
-        self._led_light = None    # использование подсветки
-        self._power_per_h = None    # потребление
-        self._antifreeze_temp = None
-        self._tariff_1 = None
-        self._tariff_2 = None
-        self._tariff_3 = None
+        coordinator.async_add_listener(self._update)
+
+        self._device = Thermostat()
+        self._heating = False
 
         self._update()
 
@@ -125,8 +112,12 @@ class Thermostat2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        await self._device.set_state(not self._heating)
-        self._update()
+        params = {"state": State.ON.value}
+
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
 
     @property
     def hvac_action(self) -> Optional[str]:
@@ -148,8 +139,11 @@ class Thermostat2Climate(ClimateBase):
                 self._name, str(preset_mode.lower()), SUPPORT_PRESETS)
             return None
 
-        await self._device.set_mode(HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_COMFORT))
-        self._update()
+        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_COMFORT)}
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
 
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperature."""
@@ -167,8 +161,11 @@ class Thermostat2Climate(ClimateBase):
                 self._min_temp, self._max_temp)
             return
 
-        await self._device.set_set_temp(target_temperature * 10)
-        self._update()
+        params = {"set_temp": target_temperature * 10}
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
 
     @property
     def precision(self):
@@ -182,29 +179,22 @@ class Thermostat2Climate(ClimateBase):
         or automations based on teh provided information
         """
         return {
-            "room_temp": self._room_temp,
-            "floor_temp": self._floor_temp,
-            "open_window": self._open_window,
-            "sensor_mode": self._sensor_mode.name.lower() if self._sensor_mode else None,
-            "sensor_type": self._sensor_type.name.lower() if self._sensor_type else None,
-            "button_lock": self._button_lock,
-            "floor_cover_type": self._floor_cover_type.name.lower() if self._floor_cover_type else None,
-            "heating": self._heating_on,
-            "led_light": self._led_light,
-            "power_per_h": self._power_per_h,
-            "antifreeze_temp": self._antifreeze_temp,
-            "antifreeze_mode": self._antifreeze_temp > 0,
-            "tariff_1": self._tariff_1,
-            "tariff_2": self._tariff_2,
-            "tariff_3": self._tariff_3,
+            "room_temp": self._device.room_temp,
+            "floor_temp": self._device.floor_temp,
+            "open_window": self._device.open_window,
+            "sensor_mode": self._device.sensor_mode.name.lower(),
+            "sensor_type": self._device.sensor_type.name.lower(),
+            "button_lock": self._device.button_lock,
+            "floor_cover_type": self._device.pol_type.name.lower(),
+            "heating": self._device.heating_on,
+            "led_light": self._device.led_light,
+            "power_per_h": self._device.power_per_h,
+            "antifreeze_temp": self._device.antifreeze_temp,
+            "antifreeze_mode": self._device.antifreeze_temp > 0,
+            "tariff_1": self._device.tariff_1,
+            "tariff_2": self._device.tariff_2,
+            "tariff_3": self._device.tariff_3,
         }
-
-    async def async_update(self):
-        """
-        Update local data
-        """
-        await self._device.update()
-        self._update()
 
     def _update(self):
         """
@@ -212,24 +202,24 @@ class Thermostat2Climate(ClimateBase):
         """
         _LOGGER.debug("Thermostat2Climate.update")
 
+        for data in self.coordinator.data:
+            if data["uid"] == self._uid:
+                self._device.from_json(data)
+
         self._current_temp = self._device.floor_temp
         self._heating = self._device.state
-        self._preset = DEVICE_PRESET_TO_HA.get(self._device.mode)
+        self._preset = DEVICE_PRESET_TO_HA.get(self._device.mode.value)
         self._available = self._device.online
         self._target_temperature = self._device.set_temp
-        self._name = self._device.room
 
-        self._room_temp = self._device.room_temp
-        self._floor_temp = self._device.floor_temp
-        self._sensor_mode = self._device.sensor_mode
-        self._sensor_type = self._device.sensor_type
-        self._button_lock = self._device.button_lock
-        self._floor_cover_type = self._device.pol_type
-        self._open_window = self._device.open_window
-        self._heating_on = self._device.heating_on
-        self._led_light = self._device.led_light
-        self._power_per_h = self._device.power_per_h
-        self._antifreeze_temp = self._device.antifreeze_temp
-        self._tariff_1 = self._device.tariff_1
-        self._tariff_2 = self._device.tariff_2
-        self._tariff_3 = self._device.tariff_3
+    def _update_coordinator_data(self, params: dict) -> None:
+        """Update data in coordinator"""
+        devices = self.coordinator.data
+
+        for index, device in enumerate(devices):
+            if device["uid"] == self._uid:
+                for param in params:
+                    devices[index][param] = params[param]
+
+        self.coordinator.async_set_updated_data(devices)
+        self._update()
