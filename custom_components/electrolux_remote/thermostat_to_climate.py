@@ -68,7 +68,7 @@ HA_PRESET_TO_DEVICE = {
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Electrolux Thermostat"
+DEFAULT_NAME = "Thermostat"
 
 
 class Thermostat2Climate(ClimateBase):
@@ -112,7 +112,7 @@ class Thermostat2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        params = {"state": State.ON.value}
+        params = {"state": 1 - int(self._heating)}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 

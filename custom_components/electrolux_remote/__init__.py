@@ -12,7 +12,7 @@ from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, HOST_RUSKLIMAT, STARTUP_MESSAGE, CONF_APPCODE
-from .api import ApiInterface, RusclimatApi
+from .api import ApiInterface, RusclimatApi, TestApi
 from .update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)

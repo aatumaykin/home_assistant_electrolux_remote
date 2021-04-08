@@ -55,14 +55,6 @@ class ApiInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_device_params(self, uid: str) -> []:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def set_device_param(self, uid: str, param: str, value) -> bool:
-        raise NotImplementedError
-
-    @abc.abstractmethod
     async def set_device_params(self, uid: str, params: dict) -> bool:
         raise NotImplementedError
 
@@ -101,24 +93,6 @@ class RusclimatApi(ApiInterface):
 
         return json
 
-    async def get_device_params(self, uid: str) -> []:
-        if self._token is None:
-            await self.login()
-
-        payload = {
-            "token": self._token,
-            "uid": [uid]
-        }
-
-        json = await self._request(API_GET_DEVICE_PARAMS, payload)
-
-        if json["error_code"] == ERROR_DEVICE_UNAVAILABLE:
-            raise DeviceUnavailable(json["error_message"])
-
-        self._check_response_code(json)
-
-        return json["result"]["device"]
-
     async def get_data(self) -> []:
         if self._token is None:
             await self.login()
@@ -147,21 +121,6 @@ class RusclimatApi(ApiInterface):
         payload = {
             "uid": uid,
             "params": params
-        }
-
-        json = await self._update_device_params(payload)
-
-        return self._check_result(json)
-
-    async def set_device_param(self, uid: str, param: str, value) -> bool:
-        """Update param"""
-        _LOGGER.debug(f"Update params: {param} -> {value}")
-
-        payload = {
-            "uid": uid,
-            "params": {
-                param: value
-            }
         }
 
         json = await self._update_device_params(payload)
@@ -237,7 +196,7 @@ class RusclimatApi(ApiInterface):
 class TestApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
-    def __init__(self, host: str, username: str, password: str, appcode: str):
+    def __init__(self, host: str, username: str, password: str, appcode: str, session: ClientSession):
         self.devices = [
             {
                 "tempid": "181304",
@@ -452,16 +411,6 @@ class TestApi(ApiInterface):
 
     async def get_data(self) -> []:
         return self.devices
-
-    async def get_device_params(self, uid: str) -> []:
-        return self.devices
-
-    async def set_device_param(self, uid: str, param: str, value) -> bool:
-        for i, device in enumerate(self.devices):
-            if device["uid"] == uid:
-                self.devices[i][param] = value
-
-        return True
 
     async def set_device_params(self, uid: str, params: dict) -> bool:
         for i, device in enumerate(self.devices):

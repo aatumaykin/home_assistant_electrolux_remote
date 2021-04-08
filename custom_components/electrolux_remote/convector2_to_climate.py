@@ -57,7 +57,7 @@ HA_PRESET_TO_DEVICE = {
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Electrolux Convector"
+DEFAULT_NAME = "Convector"
 
 
 class Convector2Climate(ClimateBase):
@@ -119,8 +119,11 @@ class Convector2Climate(ClimateBase):
     @property
     def hvac_action(self) -> Optional[str]:
         """Return the current running hvac operation if supported.  Need to be one of CURRENT_HVAC_*.  """
-        if self._device.state:
+        if self._device.state and self._device.power == 0:
+            return CURRENT_HVAC_IDLE
+        elif self._device.state:
             return CURRENT_HVAC_HEAT
+
         return CURRENT_HVAC_IDLE
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
@@ -189,7 +192,6 @@ class Convector2Climate(ClimateBase):
             "sensor_fault": self._device.sensor_fault,
             "window_open": self._device.window_open,
             "mute": self._device.mute,
-            "window_opened": self._device.window_opened,
             "calendar_on": self._device.calendar_on,
             "brightness": self._device.brightness_title,
             "led_off_auto": self._device.led_off_auto,
@@ -208,7 +210,6 @@ class Convector2Climate(ClimateBase):
             "time_month": self._device.time_month,
             "time_year": self._device.time_year,
             "time_weekday": self._device.time_weekday,
-            "lock": self._device.lock,
             "preset_monday": self._device.preset_monday,
             "preset_tuesday": self._device.preset_tuesday,
             "preset_wednesday": self._device.preset_wednesday,
