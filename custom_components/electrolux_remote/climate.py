@@ -5,8 +5,8 @@ import logging
 from .convector2_to_climate import Convector2Climate
 from .thermostat_to_climate import Thermostat2Climate
 
-from .api import ApiInterface
 from .const import DOMAIN
+from .update_coordinator import Coordinator
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -18,21 +18,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     """
     Setup the climate platform
     """
+    coordinator: Coordinator = hass.data[DOMAIN][config_entry.entry_id]
+
     devices = []
 
     try:
-
-        client: ApiInterface = hass.data[DOMAIN][config_entry.entry_id]
-
-        for deviceData in await client.get_data():
+        for deviceData in coordinator.data:
             _LOGGER.debug(f"device: {deviceData}")
 
             if deviceData["type"] == Convector2Climate.device_type():
-                device = Convector2Climate(deviceData["uid"], client, deviceData)
+                device = Convector2Climate(deviceData["uid"], coordinator)
                 devices.append(device)
 
             if deviceData["type"] == Thermostat2Climate.device_type():
-                device = Thermostat2Climate(deviceData["uid"], client, deviceData)
+                device = Thermostat2Climate(deviceData["uid"], coordinator)
                 devices.append(device)
     except Exception as err:
         _LOGGER.error(err)

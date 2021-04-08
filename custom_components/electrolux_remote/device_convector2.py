@@ -4,9 +4,6 @@ import logging
 
 from enum import IntEnum
 
-from .device_base import Device, State
-from .api import ApiInterface
-
 _LOGGER = logging.getLogger(__name__)
 
 DELTA_ECO_DEFAULT = 4
@@ -16,6 +13,11 @@ TEMP_MAX = 35
 
 TEMP_ANTIFROST_MIN = 3
 TEMP_ANTIFROST_MAX = 7
+
+
+class State(IntEnum):
+    OFF = 0
+    ON = 1
 
 
 class Preset(IntEnum):
@@ -65,11 +67,11 @@ BRIGHTNESS = {
     BrightnessMode.FULL: "100%",
 }
 
-class Convector2(Device):
 
-    def __init__(self, uid: str, api: ApiInterface, data: dict = None):
-        super().__init__(uid, api)
-
+class Convector2:
+    def __init__(self):
+        self._state = State.OFF.value
+        self._online = State.OFF.value
         self._child_lock = State.OFF.value
         self._sensor_fault = State.OFF.value
         self._window_open = State.OFF.value
@@ -150,86 +152,10 @@ class Convector2(Device):
         self._curr_scene_dropped = 0
         self._lock = State.OFF.value    # режим блокировки
 
-        self._from_json(data)
-
-    async def set_child_lock(self, value: bool):
-        _LOGGER.debug(f"set_child_lock: {value}")
-
-        if await self._api.set_device_param(self.uid, 'child_lock', int(value)):
-            await self.update()
-
-    async def set_window_open(self, value: bool):
-        _LOGGER.debug(f"set_window_open: {value}")
-
-        if await self._api.set_device_param(self.uid, 'window_open', int(value)):
-            await self.update()
-
-    async def set_mute(self, value: bool):
-        _LOGGER.debug(f"set_mute: {value}")
-
-        if await self._api.set_device_param(self.uid, 'mute', int(value)):
-            await self.update()
-
-    async def set_brightness(self, mode: BrightnessMode):
-        _LOGGER.debug(f"set_brightness: {mode}")
-
-        if await self._api.set_device_param(self.uid, 'brightness', mode.value):
-            await self.update()
-
-    async def set_led_off_auto(self, mode: LedMode):
-        _LOGGER.debug(f"set_led_off_auto: {mode}")
-
-        if await self._api.set_device_param(self.uid, 'led_off_auto', mode.value):
-            await self.update()
-
-    async def set_delta_eco(self, value: int):
-        _LOGGER.debug(f"set_delta_eco: {value}")
-
-        if await self._api.set_device_param(self.uid, 'delta_eco', value):
-            await self.update()
-
-    async def set_temp_antifrost(self, value: int):
-        _LOGGER.debug(f"set_temp_antifrost: {value}")
-
-        if await self._api.set_device_param(self.uid, 'temp_antifrost', value):
-            await self.update()
-
-    async def set_heat_mode(self, mode: HeatMode):
-        _LOGGER.debug(f"set_heat_mode: {mode}")
-
-        if await self._api.set_device_param(self.uid, 'heat_mode', mode.value):
-            await self.update()
-
-    async def set_power(self, mode: PowerMode):
-        _LOGGER.debug(f"set_power: {mode}")
-
-        if await self._api.set_device_param(self.uid, 'power', mode.value):
-            await self.update()
-
-    async def set_room(self, value: str):
-        _LOGGER.debug(f"set_room: {value}")
-
-        if await self._api.set_device_param(self.uid, 'room', value):
-            await self.update()
-
-    async def set_lock(self, value: bool):
-        _LOGGER.debug(f"set_lock: {value}")
-
-        if await self._api.set_device_param(self.uid, 'lock', int(value)):
-            await self.update()
-
-    async def set_mode(self, mode: WorkMode):
-        _LOGGER.debug(f"set_mode: {mode.value}")
-
-        if await self._api.set_device_param(self.uid, 'mode', mode.value):
-            await self.update()
-
-    async def set_temp_comfort(self, value: int):
-        _LOGGER.debug(f"set_temp_comfort: {value}")
-
-        if await self._api.set_device_param(self.uid, 'temp_comfort', value):
-            await self.update()
-
+    def from_json(self, data: dict):
+        """Fill self from json data"""
+        for key in data:
+            setattr(self, f"_{key}", data[key])
 
     @property
     def child_lock(self) -> bool:
@@ -262,6 +188,9 @@ class Convector2(Device):
     @property
     def brightness(self) -> int:
         return int(self._brightness)
+    @property
+    def brightness_title(self) -> str:
+        return BRIGHTNESS[BrightnessMode(int(self._brightness))]
 
     @property
     def brightness_half(self) -> bool:
@@ -310,6 +239,10 @@ class Convector2(Device):
     @property
     def heat_mode(self) -> int:
         return int(self._heat_mode)
+
+    @property
+    def heat_mode_name(self) -> str:
+        return HeatMode(int(self._heat_mode)).name.lower()
 
     @property
     def heat_mode_manual(self) -> bool:
@@ -510,3 +443,11 @@ class Convector2(Device):
     @property
     def room(self) -> str:
         return self._room
+
+    @property
+    def state(self) -> bool:
+        return int(self._state) == State.ON.value
+
+    @property
+    def online(self) -> bool:
+        return int(self._online) == State.ON.value

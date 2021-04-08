@@ -34,9 +34,9 @@ class Device:
     async def update(self):
         for device in await self._api.get_device_params(self.uid):
             if device["uid"] == self.uid:
-                self._from_json(device)
+                self.from_json(device)
 
-    def _from_json(self, data: dict):
+    def from_json(self, data: dict):
         """Fill self from json data"""
         for key in data:
             setattr(self, f"_{key}", data[key])

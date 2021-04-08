@@ -62,6 +62,10 @@ class ApiInterface(metaclass=abc.ABCMeta):
     async def set_device_param(self, uid: str, param: str, value) -> bool:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def set_device_params(self, uid: str, params: dict) -> bool:
+        raise NotImplementedError
+
 
 class RusclimatApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
@@ -133,7 +137,26 @@ class RusclimatApi(ApiInterface):
 
         return json["result"]["device"]
 
+    async def set_device_params(self, uid: str, params: dict) -> bool:
+        """Update params"""
+        _LOGGER.debug(f"Update params: {params}")
+
+        if not params:
+            return False
+
+        payload = {
+            "uid": uid,
+            "params": params
+        }
+
+        json = await self._update_device_params(payload)
+
+        return self._check_result(json)
+
     async def set_device_param(self, uid: str, param: str, value) -> bool:
+        """Update param"""
+        _LOGGER.debug(f"Update params: {param} -> {value}")
+
         payload = {
             "uid": uid,
             "params": {
@@ -437,5 +460,13 @@ class TestApi(ApiInterface):
         for i, device in enumerate(self.devices):
             if device["uid"] == uid:
                 self.devices[i][param] = value
+
+        return True
+
+    async def set_device_params(self, uid: str, params: dict) -> bool:
+        for i, device in enumerate(self.devices):
+            if device["uid"] == uid:
+                for param in params:
+                    self.devices[i][param] = params[param]
 
         return True

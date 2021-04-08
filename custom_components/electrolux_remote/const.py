@@ -12,8 +12,6 @@ APPCODE_ELECTROLUX = "electrolux"
 HOST_RUSKLIMAT = "http://dongle.rusklimat.ru"
 LANG = "ru"
 
-PLATFORMS = ["climate"]
-
 STARTUP_MESSAGE = f"""
 -------------------------------------------------------------------
 {NAME}

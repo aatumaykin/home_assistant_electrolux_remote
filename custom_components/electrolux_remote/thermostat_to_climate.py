@@ -11,7 +11,7 @@ from .device_thermostat import (
     TEMP_MIN,
     TEMP_MAX,
 )
-from .api import ApiInterface
+from .update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
@@ -75,13 +75,14 @@ class Thermostat2Climate(ClimateBase):
     Representation of a climate device
     """
 
-    def __init__(self, uid: str, api: ApiInterface, data: Optional[dict] = None):
+    def __init__(self, uid: str, coordinator: Coordinator, data: Optional[dict] = None):
         """
         Initialize the climate device
         """
         _LOGGER.debug("Thermostat2Climate.init")
 
         super().__init__(
+            coordinator=coordinator,
             uid=uid,
             name=DEFAULT_NAME + uid,
             temp_min=TEMP_MIN,
@@ -91,7 +92,8 @@ class Thermostat2Climate(ClimateBase):
             support_presets=SUPPORT_PRESETS,
         )
 
-        self._device = Thermostat(uid, api, data)
+        self.coordinator = coordinator
+        self._device = Thermostat(uid, coordinator.api, data)
         self._heating = None
         self._room_temp = None  # комнатная температура
         self._floor_temp = None  # температура пола

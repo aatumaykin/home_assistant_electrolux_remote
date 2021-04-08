@@ -5,21 +5,24 @@ import logging
 from abc import abstractmethod
 from typing import Any, Dict, List, Optional
 from homeassistant.components.climate import ClimateEntity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from homeassistant.const import (
     TEMP_CELSIUS,
 )
+from .update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class ClimateBase(ClimateEntity):
+class ClimateBase(CoordinatorEntity, ClimateEntity):
     """
     Representation of a climate device
     """
 
     def __init__(
             self,
+            coordinator: Coordinator,
             uid: str,
             name: str,
             temp_min: float,
@@ -31,6 +34,8 @@ class ClimateBase(ClimateEntity):
         """
         Initialize the climate device
         """
+        super().__init__(coordinator)
+
         self._icon = "mdi:radiator"
         self._uid = uid
         self._name = name
@@ -45,13 +50,6 @@ class ClimateBase(ClimateEntity):
         self._target_temperature = None
         self._available = False
 
-    @abstractmethod
-    def _update(self):
-        """
-        Update local data
-        """
-        raise NotImplementedError()
-
     @staticmethod
     @abstractmethod
     def device_type() -> str:
@@ -61,21 +59,9 @@ class ClimateBase(ClimateEntity):
         raise NotImplementedError()
 
     @property
-    def should_poll(self) -> bool:
-        """
-        Polling needed for thermostat
-        """
-        return True
-
-    @property
     def hvac_modes(self) -> List[str]:
         """Return the list of available hvac operation modes. Need to be a subset of HVAC_MODES. """
         return self._support_modes
-
-    @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        return self._available
 
     @property
     def temperature_unit(self) -> str:
@@ -128,3 +114,8 @@ class ClimateBase(ClimateEntity):
     def preset_modes(self) -> List[str]:
         """Return a list of available preset modes."""
         return self._support_presets
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self._available
