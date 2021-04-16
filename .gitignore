@@ -2,3 +2,4 @@ ha
 core
 .pytest_cache
 homeassistant
+custom_components/hacs

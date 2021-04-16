@@ -36,7 +36,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
             if valid:
-                return self.async_create_entry(user_input[CONF_USERNAME], user_input)
+                return self.async_create_entry(title=user_input[CONF_USERNAME], data=user_input)
 
             self._errors["base"] = "auth"
 
@@ -50,8 +50,8 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required(CONF_USERNAME): str,
                 vol.Required(CONF_PASSWORD): str,
-                vol.Optional(CONF_HOST, HOST_RUSKLIMAT): str,
-                vol.Optional(CONF_APPCODE, APPCODE_ELECTROLUX): str,
+                vol.Optional(CONF_HOST, default=HOST_RUSKLIMAT): str,
+                vol.Optional(CONF_APPCODE, default=APPCODE_ELECTROLUX): str,
             }),
             errors=self._errors,
         )

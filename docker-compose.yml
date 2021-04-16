@@ -2,11 +2,11 @@ version: '3'
 services:
   homeassistant:
     container_name: homeassistant
-    image: homeassistant/home-assistant:2021.1.0
+    image: homeassistant/home-assistant:2021.4.4
     environment:
       - TZ=Europe/Moscow
     volumes:
-      - ./ha/2021.1:/config
+      - ./ha:/config
       - ./custom_components:/config/custom_components
     restart: always
     ports:
