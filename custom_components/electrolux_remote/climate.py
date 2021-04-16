@@ -4,6 +4,7 @@ import logging
 
 from .convector2_to_climate import Convector2Climate
 from .thermostat_to_climate import Thermostat2Climate
+from .boiler_to_climate import Boiler2Climate
 
 from .const import DOMAIN
 from .update_coordinator import Coordinator
@@ -32,6 +33,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
             if deviceData["type"] == Thermostat2Climate.device_type():
                 device = Thermostat2Climate(deviceData["uid"], coordinator)
+                devices.append(device)
+
+            if deviceData["type"] == Boiler2Climate.device_type():
+                device = Boiler2Climate(deviceData["uid"], coordinator)
                 devices.append(device)
     except Exception as err:
         _LOGGER.error(err)
