@@ -28,6 +28,7 @@
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-4.png?raw=true" width="250">
 
 Можно использовать вместе с [Lovelace simple thermostat card](https://github.com/nervetattoo/simple-thermostat#setpoints-config)
+
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-5.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-6.png?raw=true" width="250">
 
