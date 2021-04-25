@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 0.0.7
+
+### Features
+- обработка команд climate.turn_off и climate.turn_on
+
 ## Version 0.0.6
 
 ### Features
