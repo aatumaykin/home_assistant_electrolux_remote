@@ -9,6 +9,7 @@ ISSUE_URL = "https://github.com/Ailme/home_assistant_electrolux_remote/issues"
 CONF_APPCODE = "appcode"
 
 APPCODE_ELECTROLUX = "electrolux"
+APPCODE_BALLU = "ballu"
 HOST_RUSKLIMAT = "http://dongle.rusklimat.ru"
 LANG = "ru"
 
