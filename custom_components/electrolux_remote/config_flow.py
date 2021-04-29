@@ -60,7 +60,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         """Return true if credentials is valid."""
         try:
             session = async_create_clientsession(self.hass)
-            client = TestApi(
+            client = RusclimatApi(
                 host,
                 username,
                 password,

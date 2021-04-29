@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 0.0.8
+
+### Features
+- добавил appcode для устройств Ballu
+
 ## Version 0.0.7
 
 ### Features
