@@ -500,12 +500,45 @@ class TestApi(ApiInterface):
             "curr_scene_dropped": "0",
             "online": "1"
         }
+        convector = {
+            'tempid': '193048',
+            'state': '0',
+            'temp_goal': '23',
+            'temp_goal_day': '23',
+            'temp_goal_night': '19',
+            'power': '6',
+            'mode': '1',
+            'hours': '0',
+            'minutes': '0',
+            'timer': '0',
+            'lock': '0',
+            'online': '1',
+            'current_temp': '19',
+            'led': '0',
+            'error': '0',
+            'type': 'conv',
+            'current_power': '5',
+            'code': '0',
+            'uid': '184656',
+            'mac': 'set',
+            'room': 'Балкон',
+            'sort': '0',
+            'curr_slot': '0',
+            'active_slot': '0',
+            'slop': '0',
+            'curr_scene': '0',
+            'curr_scene_id': '0',
+            'wait_slot': '0',
+            'curr_slot_dropped': '0',
+            'curr_scene_dropped': '0'
+        }
 
         self.devices = [
             floor_1,
             floor_2,
             convector2,
-            centurio
+            centurio,
+            convector
         ]
 
     async def login(self) -> []:
