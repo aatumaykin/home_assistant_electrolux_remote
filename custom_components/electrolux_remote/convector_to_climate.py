@@ -45,7 +45,7 @@ Supported hvac modes:
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT]
+SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_COMFORT: WorkMode.COMFORT.value,
@@ -90,12 +90,17 @@ class ConvectorClimate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        if hvac_mode == HVAC_MODE_HEAT:
-            params = {"state": 1 - int(self._device.state)}
-            result = await self.coordinator.api.set_device_params(self._uid, params)
+        if hvac_mode == HVAC_MODE_HEAT and not self._device.state:
+            params = {"state": 1}
+        elif hvac_mode == HVAC_MODE_OFF and self._device.state:
+            params = {"state": 0}
+        else:
+            return
 
-            if result:
-                self._update_coordinator_data(params)
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
 
     @property
     def hvac_action(self) -> Optional[str]:
