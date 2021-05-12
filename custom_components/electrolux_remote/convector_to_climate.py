@@ -171,6 +171,7 @@ class ConvectorClimate(ClimateBase):
             "power": self._device.power,
             "room": self._device.room,
             "lock": self._device.lock,
+            "led": self._device.led,
         }
 
     async def async_turn_on(self) -> None:

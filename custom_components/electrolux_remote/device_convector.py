@@ -24,10 +24,9 @@ class PowerMode(IntEnum):
 
 
 class WorkMode(IntEnum):
-    COMFORT = 0
-    ECO = 1
-    NO_FROST = 2
-    OFF = 3
+    COMFORT = 1  # Day
+    ECO = 2  # Night
+    NO_FROST = 3
 
 
 class Convector:
@@ -38,6 +37,7 @@ class Convector:
         self._current_temp = 0
         self._power = PowerMode.POWER_0.value   # мощность обогрева
         self._mode = WorkMode.COMFORT.value             # режим работы
+        self._led = State.OFF  # подсветка 0 - вкл, 1 - выкл
         # таймер
         self._hours = 0
         self._minutes = 0
@@ -100,3 +100,7 @@ class Convector:
     @property
     def timer(self) -> int:
         return int(self._timer)
+
+    @property
+    def led(self) -> bool:
+        return int(self._led) == State.OFF.value
