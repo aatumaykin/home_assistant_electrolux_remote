@@ -17,7 +17,10 @@ from .update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["climate"]
+PLATFORMS = [
+    "climate",
+    "switch"
+]
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
