@@ -3,14 +3,14 @@
 import logging
 
 from abc import abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import List
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from homeassistant.const import (
     TEMP_CELSIUS,
 )
-from .update_coordinator import Coordinator
+from ..update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 

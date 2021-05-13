@@ -3,6 +3,7 @@
 import logging
 
 from enum import IntEnum
+from ..enums import State
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,11 +14,6 @@ TEMP_MAX = 35
 
 TEMP_ANTIFROST_MIN = 3
 TEMP_ANTIFROST_MAX = 7
-
-
-class State(IntEnum):
-    OFF = 0
-    ON = 1
 
 
 class Preset(IntEnum):
@@ -233,8 +229,8 @@ class Convector2:
         return int(self._minutes)
 
     @property
-    def timer(self) -> int:
-        return int(self._timer)
+    def timer(self) -> bool:
+        return int(self._timer) == State.ON.value
 
     @property
     def heat_mode(self) -> int:

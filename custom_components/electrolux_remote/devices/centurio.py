@@ -3,16 +3,12 @@
 import logging
 
 from enum import Enum, IntEnum
+from ..enums import State
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 30
 TEMP_MAX = 75
-
-
-class State(IntEnum):
-    OFF = 0
-    ON = 1
 
 
 class WaterSelfCleanState(Enum):

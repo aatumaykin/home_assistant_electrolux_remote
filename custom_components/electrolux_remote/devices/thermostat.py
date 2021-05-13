@@ -3,16 +3,12 @@
 import logging
 
 from enum import IntEnum
+from ..enums import State
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 0
 TEMP_MAX = 40
-
-
-class State(IntEnum):
-    OFF = 0
-    ON = 1
 
 
 class WorkMode(IntEnum):

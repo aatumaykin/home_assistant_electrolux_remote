@@ -2,10 +2,10 @@
 
 import logging
 
-from .convector_to_climate import ConvectorClimate
-from .convector2_to_climate import Convector2Climate
-from .thermostat_to_climate import Thermostat2Climate
-from .centurio_to_climate import Centurio2Climate
+from .climate_devices.convector import ConvectorClimate
+from .climate_devices.convector2 import Convector2Climate
+from .climate_devices.thermostat import Thermostat2Climate
+from .climate_devices.centurio import Centurio2Climate
 
 from .const import DOMAIN
 from .update_coordinator import Coordinator

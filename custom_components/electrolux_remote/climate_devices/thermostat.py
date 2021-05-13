@@ -1,17 +1,18 @@
-"""Centurio to Climate class"""
+"""Thermostat to Climate class"""
 
 import logging
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from .climate_base import ClimateBase
-from .device_centurio import (
-    Centurio,
-    WaterMode,
+from .base import ClimateBase
+from ..devices.thermostat import (
+    Thermostat,
+    WorkMode,
     TEMP_MIN,
     TEMP_MAX,
 )
-from .update_coordinator import Coordinator
+from ..enums import State
+from ..update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
@@ -19,7 +20,9 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
     CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_OFF,
+    CURRENT_HVAC_IDLE,
+    PRESET_COMFORT,
+    PRESET_ECO,
 )
 
 from homeassistant.const import (
@@ -32,15 +35,18 @@ _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 
-PRESET_OFF = 'off'
-PRESET_HALF = 'I'
-PRESET_FULL = 'II'
-
+PRESET_CALENDAR = "calendar"
+PRESET_MANUAL = "manual"
+PRESET_FORSAGE = "forsage"
+PRESET_VACATION = "vacation"
 
 SUPPORT_PRESETS = [
-    PRESET_OFF,
-    PRESET_HALF,
-    PRESET_FULL,
+    PRESET_CALENDAR,
+    PRESET_MANUAL,
+    PRESET_COMFORT,
+    PRESET_ECO,
+    PRESET_FORSAGE,
+    PRESET_VACATION,
 ]
 
 """
@@ -53,16 +59,19 @@ Supported hvac modes:
 SUPPORT_MODES = [HVAC_MODE_HEAT]
 
 HA_PRESET_TO_DEVICE = {
-    PRESET_OFF: WaterMode.OFF.value,
-    PRESET_HALF: WaterMode.HALF.value,
-    PRESET_FULL: WaterMode.FULL.value,
+    PRESET_CALENDAR: WorkMode.CALENDAR.value,
+    PRESET_MANUAL: WorkMode.MANUAL.value,
+    PRESET_COMFORT: WorkMode.COMFORT.value,
+    PRESET_ECO: WorkMode.ECO.value,
+    PRESET_FORSAGE: WorkMode.FORSAGE.value,
+    PRESET_VACATION: WorkMode.VACATION.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Centurio IQ"
+DEFAULT_NAME = "Thermostat"
 
 
-class Centurio2Climate(ClimateBase):
+class Thermostat2Climate(ClimateBase):
     """
     Representation of a climate device
     """
@@ -80,23 +89,23 @@ class Centurio2Climate(ClimateBase):
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
-            device=Centurio()
+            device=Thermostat()
         )
 
     @staticmethod
     def device_type() -> str:
-        return "centurio"
+        return "floor"
 
     @property
     def hvac_mode(self):
         """Return hvac operation """
-        if self.preset_mode == PRESET_OFF:
-            return HVAC_MODE_OFF
-        return HVAC_MODE_HEAT
+        if self._device.state:
+            return HVAC_MODE_HEAT
+        return HVAC_MODE_OFF
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        params = {"mode": 1 - int(self._device.mode.value > 0)}
+        params = {"state": 1 - int(self._device.state)}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -106,25 +115,24 @@ class Centurio2Climate(ClimateBase):
     @property
     def hvac_action(self) -> Optional[str]:
         """Return the current running hvac operation if supported.  Need to be one of CURRENT_HVAC_*.  """
-        if self.preset_mode == PRESET_OFF:
-            return CURRENT_HVAC_OFF
-        return CURRENT_HVAC_HEAT
+        if self._device.state:
+            return CURRENT_HVAC_HEAT
+        return CURRENT_HVAC_IDLE
 
     async def async_set_preset_mode(self, preset_mode) -> None:
         """Set a new preset mode. If preset_mode is None, then revert to auto."""
-        _LOGGER.debug(preset_mode)
 
         if self.preset_mode == preset_mode:
             return
 
-        if preset_mode not in SUPPORT_PRESETS:
+        if not preset_mode.lower() in SUPPORT_PRESETS:
             _LOGGER.warning(
                 "%s: set preset mode to '%s' is not supported. "
                 "Supported preset modes are %s",
-                self._name, preset_mode, SUPPORT_PRESETS)
+                self._name, str(preset_mode.lower()), SUPPORT_PRESETS)
             return None
 
-        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_OFF)}
+        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_COMFORT)}
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
         if result:
@@ -146,7 +154,7 @@ class Centurio2Climate(ClimateBase):
                 self.min_temp, self.max_temp)
             return
 
-        params = {"temp_goal": target_temperature}
+        params = {"set_temp": target_temperature * 10}
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
         if result:
@@ -164,32 +172,26 @@ class Centurio2Climate(ClimateBase):
         or automations based on teh provided information
         """
         return {
-            "timer": self._device.timer,
-            "hours": self._device.timer_hours,
-            "minutes": self._device.timer_minutes,
-            "clock_hours": self._device.clock_hours,
-            "clock_minutes": self._device.clock_minutes,
-            "self_clean": self._device.self_clean,
-            "volume": self._device.volume.value,
-            "self_clean_state": self._device.self_clean_state.value,
-            "economy_state": self._device.economy_state,
-            "economy_morning": self._device.economy_morning,
-            "economy_evening": self._device.economy_evening,
-            "economy_pause": self._device.economy_pause,
-            "power_per_h_1": self._device.power_per_h_1,
-            "power_per_h_2": self._device.power_per_h_2,
-            "timezone": self._device.timezone,
-            "timer_hours_store": self._device.timer_hours_store,
-            "timer_minutes_store": self._device.timer_minutes_store,
-            "room": self._device.room,
+            "room_temp": self._device.room_temp,
+            "floor_temp": self._device.floor_temp,
+            "open_window": self._device.open_window,
+            "sensor_mode": self._device.sensor_mode.name.lower(),
+            "sensor_type": self._device.sensor_type.name.lower(),
+            "button_lock": self._device.button_lock,
+            "floor_cover_type": self._device.pol_type.name.lower(),
+            "heating": self._device.heating_on,
+            "led_light": self._device.led_light,
+            "power_per_h": self._device.power_per_h,
+            "antifreeze_temp": self._device.antifreeze_temp,
+            "antifreeze_mode": self._device.antifreeze_temp > 0,
         }
 
     async def async_turn_on(self) -> None:
         """Turn the entity on."""
-        if self._device.mode.value > 0:
+        if self._device.state:
             return
 
-        params = {"mode": WaterMode.HALF.value}
+        params = {"state": State.ON.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -198,10 +200,10 @@ class Centurio2Climate(ClimateBase):
 
     async def async_turn_off(self) -> None:
         """Turn the entity off."""
-        if not self._device.mode.value > 0:
+        if not self._device.state:
             return
 
-        params = {"mode": WaterMode.OFF.value}
+        params = {"state": State.OFF.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -216,12 +218,12 @@ class Centurio2Climate(ClimateBase):
     @property
     def current_temperature(self) -> Optional[float]:
         """Return the current temperature."""
-        return self._device.current_temp
+        return self._device.floor_temp
 
     @property
     def target_temperature(self) -> Optional[float]:
         """Return the temperature we try to reach."""
-        return self._device.temp_goal
+        return self._device.set_temp
 
     @property
     def min_temp(self) -> float:
@@ -244,6 +246,4 @@ class Centurio2Climate(ClimateBase):
         """
         for data in self.coordinator.data:
             if data["uid"] == self._uid:
-                _LOGGER.debug(data)
                 self._device.from_json(data)
-

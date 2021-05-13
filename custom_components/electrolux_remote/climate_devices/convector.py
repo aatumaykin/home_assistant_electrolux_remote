@@ -1,18 +1,18 @@
-"""Thermostat to Climate class"""
+"""Convector to Climate class"""
 
 import logging
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from .climate_base import ClimateBase
-from .device_thermostat import (
-    Thermostat,
+from .base import ClimateBase
+from ..devices.convector import (
+    Convector,
     WorkMode,
-    State,
     TEMP_MIN,
     TEMP_MAX,
 )
-from .update_coordinator import Coordinator
+from ..enums import State
+from ..update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
@@ -22,59 +22,43 @@ from homeassistant.components.climate.const import (
     CURRENT_HVAC_HEAT,
     CURRENT_HVAC_IDLE,
     PRESET_COMFORT,
-    PRESET_ECO,
+    PRESET_ECO
 )
-
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    PRECISION_TENTHS,
+    PRECISION_WHOLE,
 )
-
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 
-PRESET_CALENDAR = "calendar"
-PRESET_MANUAL = "manual"
-PRESET_FORSAGE = "forsage"
-PRESET_VACATION = "vacation"
+PRESET_NO_FROST = "no_frost"
 
-SUPPORT_PRESETS = [
-    PRESET_CALENDAR,
-    PRESET_MANUAL,
-    PRESET_COMFORT,
-    PRESET_ECO,
-    PRESET_FORSAGE,
-    PRESET_VACATION,
-]
+SUPPORT_PRESETS = [PRESET_COMFORT, PRESET_ECO, PRESET_NO_FROST]
 
 """
 Supported hvac modes:
 - HVAC_MODE_HEAT: Heat to a target temperature (schedule off)
+- HVAC_MODE_AUTO: Follow the configured schedule
 - HVAC_MODE_OFF:  The device runs in a continuous energy savings mode. If
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT]
+SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
 HA_PRESET_TO_DEVICE = {
-    PRESET_CALENDAR: WorkMode.CALENDAR.value,
-    PRESET_MANUAL: WorkMode.MANUAL.value,
     PRESET_COMFORT: WorkMode.COMFORT.value,
     PRESET_ECO: WorkMode.ECO.value,
-    PRESET_FORSAGE: WorkMode.FORSAGE.value,
-    PRESET_VACATION: WorkMode.VACATION.value,
+    PRESET_NO_FROST: WorkMode.NO_FROST.value
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Thermostat"
+DEFAULT_NAME = "Convector"
 
 
-class Thermostat2Climate(ClimateBase):
-    """
-    Representation of a climate device
-    """
+class ConvectorClimate(ClimateBase):
+    """Representation of an Climate."""
 
     def __init__(self, uid: str, coordinator: Coordinator):
         """
@@ -89,23 +73,29 @@ class Thermostat2Climate(ClimateBase):
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
-            device=Thermostat()
+            device=Convector()
         )
 
     @staticmethod
     def device_type() -> str:
-        return "floor"
+        return "conv"
 
     @property
     def hvac_mode(self):
         """Return hvac operation """
         if self._device.state:
             return HVAC_MODE_HEAT
+
         return HVAC_MODE_OFF
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        params = {"state": 1 - int(self._device.state)}
+        if hvac_mode == HVAC_MODE_HEAT and not self._device.state:
+            params = {"state": 1}
+        elif hvac_mode == HVAC_MODE_OFF and self._device.state:
+            params = {"state": 0}
+        else:
+            return
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -115,11 +105,14 @@ class Thermostat2Climate(ClimateBase):
     @property
     def hvac_action(self) -> Optional[str]:
         """Return the current running hvac operation if supported.  Need to be one of CURRENT_HVAC_*.  """
-        if self._device.state:
+        if self._device.state and self._device.power == 0:
+            return CURRENT_HVAC_IDLE
+        elif self._device.state:
             return CURRENT_HVAC_HEAT
+
         return CURRENT_HVAC_IDLE
 
-    async def async_set_preset_mode(self, preset_mode) -> None:
+    async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set a new preset mode. If preset_mode is None, then revert to auto."""
 
         if self.preset_mode == preset_mode:
@@ -154,7 +147,7 @@ class Thermostat2Climate(ClimateBase):
                 self.min_temp, self.max_temp)
             return
 
-        params = {"set_temp": target_temperature * 10}
+        params = {"temp_goal": target_temperature}
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
         if result:
@@ -162,7 +155,7 @@ class Thermostat2Climate(ClimateBase):
 
     @property
     def precision(self):
-        return PRECISION_TENTHS
+        return PRECISION_WHOLE
 
     @property
     def device_state_attributes(self) -> Dict[str, Any]:
@@ -172,18 +165,13 @@ class Thermostat2Climate(ClimateBase):
         or automations based on teh provided information
         """
         return {
-            "room_temp": self._device.room_temp,
-            "floor_temp": self._device.floor_temp,
-            "open_window": self._device.open_window,
-            "sensor_mode": self._device.sensor_mode.name.lower(),
-            "sensor_type": self._device.sensor_type.name.lower(),
-            "button_lock": self._device.button_lock,
-            "floor_cover_type": self._device.pol_type.name.lower(),
-            "heating": self._device.heating_on,
-            "led_light": self._device.led_light,
-            "power_per_h": self._device.power_per_h,
-            "antifreeze_temp": self._device.antifreeze_temp,
-            "antifreeze_mode": self._device.antifreeze_temp > 0,
+            "hours": self._device.hours,
+            "minutes": self._device.minutes,
+            "timer": self._device.timer,
+            "power": self._device.power,
+            "room": self._device.room,
+            "lock": self._device.lock,
+            "led": self._device.led,
         }
 
     async def async_turn_on(self) -> None:
@@ -218,12 +206,15 @@ class Thermostat2Climate(ClimateBase):
     @property
     def current_temperature(self) -> Optional[float]:
         """Return the current temperature."""
-        return self._device.floor_temp
+        return self._device.current_temp
 
     @property
     def target_temperature(self) -> Optional[float]:
         """Return the temperature we try to reach."""
-        return self._device.set_temp
+        if self._device.mode is WorkMode.NO_FROST:
+            return TEMP_MIN
+
+        return self._device.temp_goal
 
     @property
     def min_temp(self) -> float:
@@ -233,6 +224,12 @@ class Thermostat2Climate(ClimateBase):
     @property
     def max_temp(self) -> float:
         """Return the maximum temperature."""
+        if self._device.mode is WorkMode.ECO:
+            return TEMP_MAX - self._device.delta_eco
+
+        if self._device.mode is WorkMode.NO_FROST:
+            return TEMP_MIN
+
         return TEMP_MAX
 
     @property
@@ -247,3 +244,4 @@ class Thermostat2Climate(ClimateBase):
         for data in self.coordinator.data:
             if data["uid"] == self._uid:
                 self._device.from_json(data)
+

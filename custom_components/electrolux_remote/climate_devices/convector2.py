@@ -2,19 +2,19 @@
 
 import logging
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from .climate_base import ClimateBase
-from .device_convector2 import (
+from .base import ClimateBase
+from ..devices.convector2 import (
     Convector2,
-    State,
     WorkMode,
     TEMP_MIN,
     TEMP_MAX,
     TEMP_ANTIFROST_MIN,
     TEMP_ANTIFROST_MAX,
 )
-from .update_coordinator import Coordinator
+from ..enums import State
+from ..update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,

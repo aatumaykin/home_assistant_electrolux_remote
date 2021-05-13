@@ -1,18 +1,17 @@
-"""Convector to Climate class"""
+"""Centurio to Climate class"""
 
 import logging
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from .climate_base import ClimateBase
-from .device_convector import (
-    Convector,
-    State,
-    WorkMode,
+from .base import ClimateBase
+from ..devices.centurio import (
+    Centurio,
+    WaterMode,
     TEMP_MIN,
     TEMP_MAX,
 )
-from .update_coordinator import Coordinator
+from ..update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
@@ -20,45 +19,53 @@ from homeassistant.components.climate.const import (
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
     CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    PRESET_COMFORT,
-    PRESET_ECO
+    CURRENT_HVAC_OFF,
 )
+
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    PRECISION_WHOLE,
+    PRECISION_TENTHS,
 )
+
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 
-PRESET_NO_FROST = "no_frost"
+PRESET_OFF = 'off'
+PRESET_HALF = 'I'
+PRESET_FULL = 'II'
 
-SUPPORT_PRESETS = [PRESET_COMFORT, PRESET_ECO, PRESET_NO_FROST]
+
+SUPPORT_PRESETS = [
+    PRESET_OFF,
+    PRESET_HALF,
+    PRESET_FULL,
+]
 
 """
 Supported hvac modes:
 - HVAC_MODE_HEAT: Heat to a target temperature (schedule off)
-- HVAC_MODE_AUTO: Follow the configured schedule
 - HVAC_MODE_OFF:  The device runs in a continuous energy savings mode. If
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
+SUPPORT_MODES = [HVAC_MODE_HEAT]
 
 HA_PRESET_TO_DEVICE = {
-    PRESET_COMFORT: WorkMode.COMFORT.value,
-    PRESET_ECO: WorkMode.ECO.value,
-    PRESET_NO_FROST: WorkMode.NO_FROST.value
+    PRESET_OFF: WaterMode.OFF.value,
+    PRESET_HALF: WaterMode.HALF.value,
+    PRESET_FULL: WaterMode.FULL.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Convector"
+DEFAULT_NAME = "Centurio IQ"
 
 
-class ConvectorClimate(ClimateBase):
-    """Representation of an Climate."""
+class Centurio2Climate(ClimateBase):
+    """
+    Representation of a climate device
+    """
 
     def __init__(self, uid: str, coordinator: Coordinator):
         """
@@ -73,29 +80,23 @@ class ConvectorClimate(ClimateBase):
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
-            device=Convector()
+            device=Centurio()
         )
 
     @staticmethod
     def device_type() -> str:
-        return "conv"
+        return "centurio"
 
     @property
     def hvac_mode(self):
         """Return hvac operation """
-        if self._device.state:
-            return HVAC_MODE_HEAT
-
-        return HVAC_MODE_OFF
+        if self.preset_mode == PRESET_OFF:
+            return HVAC_MODE_OFF
+        return HVAC_MODE_HEAT
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        if hvac_mode == HVAC_MODE_HEAT and not self._device.state:
-            params = {"state": 1}
-        elif hvac_mode == HVAC_MODE_OFF and self._device.state:
-            params = {"state": 0}
-        else:
-            return
+        params = {"mode": 1 - int(self._device.mode.value > 0)}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -105,27 +106,25 @@ class ConvectorClimate(ClimateBase):
     @property
     def hvac_action(self) -> Optional[str]:
         """Return the current running hvac operation if supported.  Need to be one of CURRENT_HVAC_*.  """
-        if self._device.state and self._device.power == 0:
-            return CURRENT_HVAC_IDLE
-        elif self._device.state:
-            return CURRENT_HVAC_HEAT
+        if self.preset_mode == PRESET_OFF:
+            return CURRENT_HVAC_OFF
+        return CURRENT_HVAC_HEAT
 
-        return CURRENT_HVAC_IDLE
-
-    async def async_set_preset_mode(self, preset_mode: str) -> None:
+    async def async_set_preset_mode(self, preset_mode) -> None:
         """Set a new preset mode. If preset_mode is None, then revert to auto."""
+        _LOGGER.debug(preset_mode)
 
         if self.preset_mode == preset_mode:
             return
 
-        if not preset_mode.lower() in SUPPORT_PRESETS:
+        if preset_mode not in SUPPORT_PRESETS:
             _LOGGER.warning(
                 "%s: set preset mode to '%s' is not supported. "
                 "Supported preset modes are %s",
-                self._name, str(preset_mode.lower()), SUPPORT_PRESETS)
+                self._name, preset_mode, SUPPORT_PRESETS)
             return None
 
-        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_COMFORT)}
+        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_OFF)}
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
         if result:
@@ -155,7 +154,7 @@ class ConvectorClimate(ClimateBase):
 
     @property
     def precision(self):
-        return PRECISION_WHOLE
+        return PRECISION_TENTHS
 
     @property
     def device_state_attributes(self) -> Dict[str, Any]:
@@ -165,21 +164,32 @@ class ConvectorClimate(ClimateBase):
         or automations based on teh provided information
         """
         return {
-            "hours": self._device.hours,
-            "minutes": self._device.minutes,
             "timer": self._device.timer,
-            "power": self._device.power,
+            "hours": self._device.timer_hours,
+            "minutes": self._device.timer_minutes,
+            "clock_hours": self._device.clock_hours,
+            "clock_minutes": self._device.clock_minutes,
+            "self_clean": self._device.self_clean,
+            "volume": self._device.volume.value,
+            "self_clean_state": self._device.self_clean_state.value,
+            "economy_state": self._device.economy_state,
+            "economy_morning": self._device.economy_morning,
+            "economy_evening": self._device.economy_evening,
+            "economy_pause": self._device.economy_pause,
+            "power_per_h_1": self._device.power_per_h_1,
+            "power_per_h_2": self._device.power_per_h_2,
+            "timezone": self._device.timezone,
+            "timer_hours_store": self._device.timer_hours_store,
+            "timer_minutes_store": self._device.timer_minutes_store,
             "room": self._device.room,
-            "lock": self._device.lock,
-            "led": self._device.led,
         }
 
     async def async_turn_on(self) -> None:
         """Turn the entity on."""
-        if self._device.state:
+        if self._device.mode.value > 0:
             return
 
-        params = {"state": State.ON.value}
+        params = {"mode": WaterMode.HALF.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -188,10 +198,10 @@ class ConvectorClimate(ClimateBase):
 
     async def async_turn_off(self) -> None:
         """Turn the entity off."""
-        if not self._device.state:
+        if not self._device.mode.value > 0:
             return
 
-        params = {"state": State.OFF.value}
+        params = {"mode": WaterMode.OFF.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -211,9 +221,6 @@ class ConvectorClimate(ClimateBase):
     @property
     def target_temperature(self) -> Optional[float]:
         """Return the temperature we try to reach."""
-        if self._device.mode is WorkMode.NO_FROST:
-            return TEMP_MIN
-
         return self._device.temp_goal
 
     @property
@@ -224,12 +231,6 @@ class ConvectorClimate(ClimateBase):
     @property
     def max_temp(self) -> float:
         """Return the maximum temperature."""
-        if self._device.mode is WorkMode.ECO:
-            return TEMP_MAX - self._device.delta_eco
-
-        if self._device.mode is WorkMode.NO_FROST:
-            return TEMP_MIN
-
         return TEMP_MAX
 
     @property
@@ -243,5 +244,6 @@ class ConvectorClimate(ClimateBase):
         """
         for data in self.coordinator.data:
             if data["uid"] == self._uid:
+                _LOGGER.debug(data)
                 self._device.from_json(data)
 
