@@ -28,7 +28,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     """Set up this integration using UI."""
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
@@ -51,13 +51,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][config_entry.entry_id] = coordinator
 
     for platform in PLATFORMS:
-        _LOGGER.info("Added new platform: %s, entry_id: %s", entry.title, entry.entry_id)
+        _LOGGER.info(f"Added new platform {platform}: {config_entry.title}, entry_id: {config_entry.entry_id}")
 
         hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, platform)
+            hass.config_entries.async_forward_entry_setup(config_entry, platform)
         )
 
     return True

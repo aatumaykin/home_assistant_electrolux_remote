@@ -533,12 +533,54 @@ class TestApi(ApiInterface):
             'curr_scene_dropped': '0'
         }
 
+        smart = {
+            'tempid': '196934',
+            'mode': '1',
+            'current_temp': '36',
+            'temp_goal': '35',
+            'undefined1': '0',
+            'undefined2': '0',
+            'undefined3': '4',
+            'undefined4': '0',
+            'self_clean': '0',
+            'volume': '0',
+            'error': '0',
+            'type': 'smart',
+            'code': '0',
+            'self_clean_state': 'disabled',
+            'timezone': '3',
+            'economy_morning': '0',
+            'economy_evening': '0',
+            'economy_pause': '0',
+            'power_per_h_1': '1300',
+            'power_per_h_2': '2000',
+            'tariff_1': '0',
+            'tariff_2': '0',
+            'tariff_3': '0',
+            'uid': '196934',
+            'mac': 'set',
+            'room': 'Дача',
+            'sort': '0',
+            'clock_hours': '21',
+            'clock_minutes': '03',
+            'curr_slot': '0',
+            'active_slot': '0',
+            'slop': '0',
+            'curr_scene': '0',
+            'curr_scene_id': '0',
+            'wait_slot': '0',
+            'curr_slot_dropped': '0',
+            'curr_scene_dropped': '0',
+            'online': '1'
+        }
+
         self.devices = [
             floor_1,
             floor_2,
             convector2,
             centurio,
-            convector
+            convector,
+            smart
         ]
 
     async def login(self) -> []:
@@ -559,6 +601,8 @@ class TestApi(ApiInterface):
     async def set_device_params(self, uid: str, params: dict) -> bool:
         for i, device in enumerate(self.devices):
             if device["uid"] == uid:
+                _LOGGER.debug(f"{uid} update params: {params}")
+
                 for param in params:
                     self.devices[i][param] = params[param]
 

@@ -1,4 +1,4 @@
-"""Centurio class (type=centurio)"""
+"""Smart class (type=smart)"""
 
 import logging
 
@@ -38,18 +38,13 @@ class WaterMode(IntEnum):
     NO_CONNECTION = 3
 
 
-class Centurio:
+class Smart:
     def __init__(self):
         self._online = State.OFF.value
         self._room = None  # название помещения
         self._mode = WaterMode.OFF.value  # мощность нагрева
         self._current_temp = 75
         self._temp_goal = 75
-        self._timer = State.OFF.value
-        self._timer_hours = 0
-        self._timer_minutes = 0
-        self._clock_hours = 0
-        self._clock_minutes = 0
         self._self_clean = State.OFF.value  # bacteria stop system
         self._volume = Capacity.CAPACITY_100.value
         self._error = 0
@@ -63,11 +58,9 @@ class Centurio:
         self._tariff_1 = 0
         self._tariff_2 = 0
         self._tariff_3 = 0
-        self._minutes_diff = 0
+        self._clock_hours = 0
+        self._clock_minutes = 0
         self._timezone = 0
-        self._timer_hours_store = 0
-        self._timer_minutes_store = 0
-        self._seconds_diff = 0
         self._sort = 0
         self._curr_slot = 0
         self._active_slot = 0
@@ -112,20 +105,8 @@ class Centurio:
         return int(self._self_clean) == State.ON.value
 
     @property
-    def timer(self) -> bool:
-        return int(self._timer) == State.ON.value
-
-    @property
     def temp_goal(self) -> int:
         return int(self._temp_goal)
-
-    @property
-    def timer_hours(self) -> int:
-        return int(self._timer_hours)
-
-    @property
-    def timer_minutes(self) -> int:
-        return int(self._timer_minutes)
 
     @property
     def economy_evening(self) -> int:
@@ -134,14 +115,6 @@ class Centurio:
     @property
     def economy_morning(self) -> int:
         return int(self._economy_morning)
-
-    @property
-    def timer_hours_store(self) -> int:
-        return int(self._timer_hours_store)
-
-    @property
-    def timer_minutes_store(self) -> int:
-        return int(self._timer_minutes_store)
 
     @property
     def economy_pause(self) -> bool:

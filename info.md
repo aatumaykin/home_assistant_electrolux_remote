@@ -12,14 +12,14 @@
 | --------------- | ----------------------------------- |
 | `climate`       | Add climate entity                  |
 
-{{ "{% if not installed %}" }}
+{% if not installed %}
 
 ## Installation
 
 1. Click install.
 1. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Electrolux remote".
 
-{{ "{% endif %}" }}
+{% endif %}
 
 {%- if version_installed == "main" %}
 
@@ -28,6 +28,16 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 0.0.9
+
+### Features
+- добавлены switch для конвектора с типом conv
+- добавлена поддержка бойлера Ballu Smart
+- для всех устройств добавлен режим OFF
+
+### Fix
+- исправлены ошибки
+
 ## Version 0.0.8
 
 ### Features

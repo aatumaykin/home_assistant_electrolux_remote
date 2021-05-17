@@ -4,6 +4,7 @@ import logging
 
 from typing import Any, Dict, Optional
 
+from ..const import DEVICE_CONVECTOR24
 from .base import ClimateBase
 from ..devices.convector2 import (
     Convector2,
@@ -48,7 +49,7 @@ Supported hvac modes:
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_AUTO]
+SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_AUTO, HVAC_MODE_OFF]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_COMFORT: WorkMode.COMFORT.value,
@@ -72,7 +73,7 @@ class Convector2Climate(ClimateBase):
         super().__init__(
             coordinator=coordinator,
             uid=uid,
-            name=f"{DEFAULT_NAME} {uid}",
+            name=DEFAULT_NAME,
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
@@ -81,7 +82,7 @@ class Convector2Climate(ClimateBase):
 
     @staticmethod
     def device_type() -> str:
-        return "convector24"
+        return DEVICE_CONVECTOR24
 
     @property
     def hvac_mode(self):
@@ -96,24 +97,21 @@ class Convector2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        if hvac_mode == HVAC_MODE_AUTO:
-            params = {}
-
-            if not self._device.state:
-                params["state"] = State.ON.value
-            else:
-                params["heat_mode"] = 1 - self._device.heat_mode
-
-            result = await self.coordinator.api.set_device_params(self._uid, params)
-
-            if result:
-                self._update_coordinator_data(params)
+        if hvac_mode == HVAC_MODE_AUTO and not self._device.state:
+            params = {"state": State.ON.value}
+        elif hvac_mode == HVAC_MODE_AUTO and self._device.state:
+            params = {"heat_mode": 1 - self._device.heat_mode}
         elif hvac_mode == HVAC_MODE_HEAT:
-            params = {"state": 1 - int(self._device.state)}
-            result = await self.coordinator.api.set_device_params(self._uid, params)
+            params = {"state": State.ON.value}
+        elif hvac_mode == HVAC_MODE_OFF:
+            params = {"state": State.OFF.value}
+        else:
+            return
 
-            if result:
-                self._update_coordinator_data(params)
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
 
     @property
     def hvac_action(self) -> Optional[str]:

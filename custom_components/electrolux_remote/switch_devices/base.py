@@ -1,10 +1,10 @@
 """Base switch class"""
 
 import logging
-from typing import Optional
 
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.components.switch import SwitchEntity
+from homeassistant.components.switch import SwitchEntity, ENTITY_ID_FORMAT
+from homeassistant.helpers.entity import async_generate_entity_id
 from ..update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -16,7 +16,8 @@ class SwitchDevice(CoordinatorEntity, SwitchEntity):
         uid: str,
         name: str,
         coordinator: Coordinator,
-        icon,
+        icon_on: str,
+        icon_off: str,
         device,
         param_name: str,
         property_name: str,
@@ -31,13 +32,18 @@ class SwitchDevice(CoordinatorEntity, SwitchEntity):
         super().__init__(coordinator)
 
         self._uid = uid
-        self._name = name
-        self._icon = icon
+        self._name = f"{name} {uid}"
+        self._icon_on = icon_on
+        self._icon_off = icon_off
         self._device = device
         self._param_name = param_name
         self._property_name = property_name
         self._value_off = value_off
         self._value_on = value_on
+
+        self.entity_id = async_generate_entity_id(
+            f"{ENTITY_ID_FORMAT}", self._name, current_ids=[uid]
+        )
 
         coordinator.async_add_listener(self._update)
         self._update()
@@ -48,9 +54,9 @@ class SwitchDevice(CoordinatorEntity, SwitchEntity):
         return self._name
 
     @property
-    def icon(self) -> Optional[str]:
+    def icon(self) -> str:
         """Return the icon to use in the frontend, if any."""
-        return self._icon
+        return self._icon_on if self.is_on else self._icon_off
 
     @property
     def is_on(self) -> bool:

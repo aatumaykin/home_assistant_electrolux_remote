@@ -1,13 +1,13 @@
-"""Centurio to Climate class"""
+"""Smart to Climate class"""
 
 import logging
 
 from typing import Any, Dict, Optional
 
-from ..const import DEVICE_CENTURIO
+from ..const import DEVICE_SMART
 from .base import ClimateBase
-from ..devices.centurio import (
-    Centurio,
+from ..devices.smart import (
+    Smart,
     WaterMode,
     TEMP_MIN,
     TEMP_MAX,
@@ -60,10 +60,10 @@ HA_PRESET_TO_DEVICE = {
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Centurio IQ"
+DEFAULT_NAME = "Smart"
 
 
-class Centurio2Climate(ClimateBase):
+class Smart2Climate(ClimateBase):
     """
     Representation of a climate device
     """
@@ -81,12 +81,12 @@ class Centurio2Climate(ClimateBase):
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
-            device=Centurio()
+            device=Smart()
         )
 
     @staticmethod
     def device_type() -> str:
-        return DEVICE_CENTURIO
+        return DEVICE_SMART
 
     @property
     def hvac_mode(self):
@@ -97,6 +97,7 @@ class Centurio2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
+
         if hvac_mode == HVAC_MODE_HEAT:
             params = {"mode": WaterMode.HALF.value}
         elif hvac_mode == HVAC_MODE_OFF:
@@ -170,9 +171,6 @@ class Centurio2Climate(ClimateBase):
         or automations based on teh provided information
         """
         return {
-            "timer": self._device.timer,
-            "hours": self._device.timer_hours,
-            "minutes": self._device.timer_minutes,
             "clock_hours": self._device.clock_hours,
             "clock_minutes": self._device.clock_minutes,
             "self_clean": self._device.self_clean,
@@ -185,8 +183,6 @@ class Centurio2Climate(ClimateBase):
             "power_per_h_1": self._device.power_per_h_1,
             "power_per_h_2": self._device.power_per_h_2,
             "timezone": self._device.timezone,
-            "timer_hours_store": self._device.timer_hours_store,
-            "timer_minutes_store": self._device.timer_minutes_store,
             "room": self._device.room,
         }
 

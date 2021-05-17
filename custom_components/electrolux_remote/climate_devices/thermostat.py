@@ -4,6 +4,7 @@ import logging
 
 from typing import Any, Dict, Optional
 
+from ..const import DEVICE_FLOOR
 from .base import ClimateBase
 from ..devices.thermostat import (
     Thermostat,
@@ -56,7 +57,7 @@ Supported hvac modes:
                   configured as one of the supported hvac modes this mode
                   can be used to activate the vacation mode
 """
-SUPPORT_MODES = [HVAC_MODE_HEAT]
+SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_CALENDAR: WorkMode.CALENDAR.value,
@@ -85,7 +86,7 @@ class Thermostat2Climate(ClimateBase):
         super().__init__(
             coordinator=coordinator,
             uid=uid,
-            name=f"{DEFAULT_NAME} {uid}",
+            name=DEFAULT_NAME,
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
@@ -94,7 +95,7 @@ class Thermostat2Climate(ClimateBase):
 
     @staticmethod
     def device_type() -> str:
-        return "floor"
+        return DEVICE_FLOOR
 
     @property
     def hvac_mode(self):
@@ -105,7 +106,12 @@ class Thermostat2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
-        params = {"state": 1 - int(self._device.state)}
+        if hvac_mode == HVAC_MODE_HEAT:
+            params = {"state": State.ON.value}
+        elif hvac_mode == HVAC_MODE_OFF:
+            params = {"state": State.OFF.value}
+        else:
+            return
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 

@@ -6,6 +6,7 @@ from .base import SwitchDevice
 from ..enums import State
 from ..devices.convector import Convector
 from ..update_coordinator import Coordinator
+from ..const import DEVICE_CONVECTOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,8 +23,9 @@ class ConvectorSwitches:
             SwitchDevice(
                 uid=uid,
                 coordinator=coordinator,
-                name=f"Led_{uid}",
-                icon="mdi:theme-light-dark",
+                name=f"Led",
+                icon_on="mdi:theme-light-dark",
+                icon_off="mdi:theme-light-dark",
                 device=device,
                 param_name="led",
                 property_name="led",
@@ -34,8 +36,9 @@ class ConvectorSwitches:
             SwitchDevice(
                 uid=uid,
                 coordinator=coordinator,
-                name=f"Lock_{uid}",
-                icon="mdi:lock",
+                name=f"Lock",
+                icon_on="mdi:lock",
+                icon_off="mdi:lock",
                 device=device,
                 param_name="lock",
                 property_name="lock",
@@ -46,8 +49,9 @@ class ConvectorSwitches:
             SwitchDevice(
                 uid=uid,
                 coordinator=coordinator,
-                name=f"Timer_{uid}",
-                icon="mdi:timer",
+                name=f"Timer",
+                icon_on="mdi:timer",
+                icon_off="mdi:timer",
                 device=device,
                 param_name="timer",
                 property_name="timer",
@@ -58,7 +62,7 @@ class ConvectorSwitches:
 
     @staticmethod
     def device_type() -> str:
-        return "conv"
+        return DEVICE_CONVECTOR
 
     def get_sensors(self):
         return self.switches

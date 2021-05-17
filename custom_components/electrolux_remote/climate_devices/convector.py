@@ -4,6 +4,7 @@ import logging
 
 from typing import Any, Dict, Optional
 
+from ..const import DEVICE_CONVECTOR
 from .base import ClimateBase
 from ..devices.convector import (
     Convector,
@@ -69,7 +70,7 @@ class ConvectorClimate(ClimateBase):
         super().__init__(
             coordinator=coordinator,
             uid=uid,
-            name=f"{DEFAULT_NAME} {uid}",
+            name=DEFAULT_NAME,
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
@@ -78,7 +79,7 @@ class ConvectorClimate(ClimateBase):
 
     @staticmethod
     def device_type() -> str:
-        return "conv"
+        return DEVICE_CONVECTOR
 
     @property
     def hvac_mode(self):

@@ -8,18 +8,20 @@
 
 
 
-Компонент работает через облако эмулируя работу приложения Home Comfort: climatic appliances
+Компонент работает через облако эмулируя работу приложения Home Comfort: climatic appliances и Ballu Home
 
 ## Usage:
 - установить компонент либо в custom_components (через копирование либо через HACS)
 - перейти в интеграции HA и найти в поиске "Electrolux Remote"
 - заполнить логин/пароль от приложения Home Comfort: climatic appliances
-- после авторизации на сервере автоматически должно добавиться устройство Climate связанное с конвектором
+- в зависимости от производителя в поле appcode выбрать Electrolux или Ballu
+- после авторизации на сервере в интеграции должны появиться устройства
 
 ## Features
-Добавлена минимальная работа с:
-- одним из видов конвектора
-- термостатом
+Поддерживаются устройства Electrolux и Ballu:
+- конвекторы (техническое обозначение: conv и convector24)
+- термостат ETS-16
+- бойлеры (centurio и smart)
 
 ## Screenshot
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">

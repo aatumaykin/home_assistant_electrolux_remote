@@ -1,6 +1,6 @@
 {
   "name": "Electrolux device remote",
-  "domains": ["climate"],
+  "domains": ["climate", "switch"],
   "iot_class": "Cloud Polling",
   "homeassistant": "2021.1.0"
 }

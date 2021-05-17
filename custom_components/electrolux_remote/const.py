@@ -3,7 +3,7 @@
 NAME = "{{ Electrolux remote }}"
 DOMAIN = "electrolux_remote"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.0.8"
+VERSION = "0.0.9"
 ISSUE_URL = "https://github.com/Ailme/home_assistant_electrolux_remote/issues"
 
 CONF_APPCODE = "appcode"
@@ -22,3 +22,9 @@ If you have any issues with this you need to open an issue here:
 {ISSUE_URL}
 -------------------------------------------------------------------
 """
+
+DEVICE_CENTURIO = "centurio"
+DEVICE_CONVECTOR = "conv"
+DEVICE_CONVECTOR24 = "convector24"
+DEVICE_SMART = "smart"
+DEVICE_FLOOR = "floor"

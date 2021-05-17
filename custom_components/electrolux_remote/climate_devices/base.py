@@ -4,8 +4,9 @@ import logging
 
 from abc import abstractmethod
 from typing import List
-from homeassistant.components.climate import ClimateEntity
+from homeassistant.components.climate import ClimateEntity, ENTITY_ID_FORMAT
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.entity import async_generate_entity_id
 
 from homeassistant.const import (
     TEMP_CELSIUS,
@@ -37,11 +38,15 @@ class ClimateBase(CoordinatorEntity, ClimateEntity):
 
         self._icon = "mdi:radiator"
         self._uid = uid
-        self._name = name
+        self._name = f"{name} {uid}"
         self._support_flags = support_flags
         self._support_modes = support_modes
         self._support_presets = support_presets
         self._device = device
+
+        self.entity_id = async_generate_entity_id(
+            f"{ENTITY_ID_FORMAT}", self._name, current_ids=[uid]
+        )
 
         coordinator.async_add_listener(self._update)
         self._update()
