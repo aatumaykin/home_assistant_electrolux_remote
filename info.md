@@ -31,7 +31,7 @@ This is **only** intended for development!
 ## Version 0.0.9
 
 ### Features
-- добавлены switch для конвектора с типом conv
+- добавлены переключатели для конвекторов с типом conv и convector24
 - добавлена поддержка бойлера Ballu Smart
 - для всех устройств добавлен режим OFF
 
