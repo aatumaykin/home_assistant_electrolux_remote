@@ -5,7 +5,8 @@ import logging
 from .climate_devices.convector import ConvectorClimate
 from .climate_devices.convector2 import Convector2Climate
 from .climate_devices.thermostat import Thermostat2Climate
-from .climate_devices.centurio import Centurio2Climate
+from .climate_devices.centurio import CenturioClimate
+from .climate_devices.centurio2 import Centurio2Climate
 from .climate_devices.smart import Smart2Climate
 
 from .const import DOMAIN
@@ -37,6 +38,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
             if deviceData["type"] == Thermostat2Climate.device_type():
                 device = Thermostat2Climate(deviceData["uid"], coordinator)
+
+            if deviceData["type"] == CenturioClimate.device_type():
+                device = CenturioClimate(deviceData["uid"], coordinator)
 
             if deviceData["type"] == Centurio2Climate.device_type():
                 device = Centurio2Climate(deviceData["uid"], coordinator)

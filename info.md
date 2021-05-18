@@ -33,6 +33,7 @@ This is **only** intended for development!
 ### Features
 - добавлены переключатели для конвекторов с типом conv и convector24
 - добавлена поддержка бойлера Ballu Smart
+- добавлена поддержка бойлера Electrolux Centurio IQ 2.0
 - для всех устройств добавлен режим OFF
 
 ### Fix

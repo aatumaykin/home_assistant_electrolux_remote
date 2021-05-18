@@ -24,6 +24,7 @@ If you have any issues with this you need to open an issue here:
 """
 
 DEVICE_CENTURIO = "centurio"
+DEVICE_CENTURIO2 = "centurio2"
 DEVICE_CONVECTOR = "conv"
 DEVICE_CONVECTOR24 = "convector24"
 DEVICE_SMART = "smart"

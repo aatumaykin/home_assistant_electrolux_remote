@@ -1,13 +1,13 @@
-"""Centurio to Climate class"""
+"""Centurio2 to Climate class"""
 
 import logging
 
 from typing import Any, Dict, Optional
 
-from ..const import DEVICE_CENTURIO
+from ..const import DEVICE_CENTURIO2
 from .base import ClimateBase
-from ..devices.centurio import (
-    Centurio,
+from ..devices.centurio2 import (
+    Centurio2,
     WaterMode,
     TEMP_MIN,
     TEMP_MAX,
@@ -34,14 +34,20 @@ _LOGGER = logging.getLogger(__name__)
 SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 
 PRESET_OFF = 'off'
-PRESET_HALF = 'I'
-PRESET_FULL = 'II'
+PRESET_I = 'I'
+PRESET_II = 'II'
+PRESET_III = 'III'
+PRESET_ANTIFREEZE = 'ANTIFREEZE'
+PRESET_SELF_CLEAN = 'SELF_CLEAN'
 
 
 SUPPORT_PRESETS = [
     PRESET_OFF,
-    PRESET_HALF,
-    PRESET_FULL,
+    PRESET_I,
+    PRESET_II,
+    PRESET_III,
+    PRESET_ANTIFREEZE,
+    PRESET_SELF_CLEAN
 ]
 
 """
@@ -55,15 +61,18 @@ SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
 HA_PRESET_TO_DEVICE = {
     PRESET_OFF: WaterMode.OFF.value,
-    PRESET_HALF: WaterMode.HALF.value,
-    PRESET_FULL: WaterMode.FULL.value,
+    PRESET_I: WaterMode.I.value,
+    PRESET_II: WaterMode.II.value,
+    PRESET_III: WaterMode.III.value,
+    PRESET_ANTIFREEZE: WaterMode.ANTIFREEZE.value,
+    PRESET_SELF_CLEAN: WaterMode.SELF_CLEAN.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
-DEFAULT_NAME = "Centurio IQ"
+DEFAULT_NAME = "Centurio IQ 2.0"
 
 
-class CenturioClimate(ClimateBase):
+class Centurio2Climate(ClimateBase):
     """
     Representation of a climate device
     """
@@ -81,12 +90,12 @@ class CenturioClimate(ClimateBase):
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
             support_presets=SUPPORT_PRESETS,
-            device=Centurio()
+            device=Centurio2()
         )
 
     @staticmethod
     def device_type() -> str:
-        return DEVICE_CENTURIO
+        return DEVICE_CENTURIO2
 
     @property
     def hvac_mode(self):
@@ -98,7 +107,7 @@ class CenturioClimate(ClimateBase):
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         if hvac_mode == HVAC_MODE_HEAT:
-            params = {"mode": WaterMode.HALF.value}
+            params = {"mode": WaterMode.I.value}
         elif hvac_mode == HVAC_MODE_OFF:
             params = {"mode": WaterMode.OFF.value}
         else:
@@ -177,16 +186,18 @@ class CenturioClimate(ClimateBase):
             "clock_minutes": self._device.clock_minutes,
             "self_clean": self._device.self_clean,
             "volume": self._device.volume.value,
-            "self_clean_state": self._device.self_clean_state.value,
             "economy_state": self._device.economy_state,
             "economy_morning": self._device.economy_morning,
             "economy_evening": self._device.economy_evening,
             "economy_pause": self._device.economy_pause,
             "power_per_h_1": self._device.power_per_h_1,
             "power_per_h_2": self._device.power_per_h_2,
+            "power_per_h_3": self._device.power_per_h_3,
             "timezone": self._device.timezone,
             "timer_hours_store": self._device.timer_hours_store,
             "timer_minutes_store": self._device.timer_minutes_store,
+            "minutes_diff": self._device.minutes_diff,
+            "seconds_diff": self._device.seconds_diff,
             "room": self._device.room,
         }
 
