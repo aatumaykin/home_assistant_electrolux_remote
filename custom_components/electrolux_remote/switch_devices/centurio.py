@@ -4,7 +4,7 @@ import logging
 
 from .base import SwitchDevice
 from ..enums import State
-from ..devices.smart import Smart
+from ..devices.centurio import Centurio
 from ..update_coordinator import Coordinator
 from ..const import DEVICE_CENTURIO
 
@@ -17,7 +17,7 @@ class CenturioSwitches:
         Initialize
         """
 
-        device = Smart()
+        device = Centurio()
 
         self.switches = [
             SwitchDevice(
