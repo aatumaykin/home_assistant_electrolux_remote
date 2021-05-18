@@ -1,4 +1,4 @@
-"""Centurio IQ 2.0 class (type=centurio2)"""
+"""Centurio IQ class (type=centurio)"""
 
 import logging
 
@@ -6,12 +6,12 @@ from .base import SwitchDevice
 from ..enums import State
 from ..devices.smart import Smart
 from ..update_coordinator import Coordinator
-from ..const import DEVICE_CENTURIO2
+from ..const import DEVICE_CENTURIO
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Centurio2Switches:
+class CenturioSwitches:
     def __init__(self, uid: str, coordinator: Coordinator):
         """
         Initialize
@@ -23,7 +23,7 @@ class Centurio2Switches:
             SwitchDevice(
                 uid=uid,
                 coordinator=coordinator,
-                name=f"Bacteria stop",
+                name=f"Self Clean",
                 icon_on="",
                 icon_off="",
                 device=device,
@@ -49,7 +49,7 @@ class Centurio2Switches:
 
     @staticmethod
     def device_type() -> str:
-        return DEVICE_CENTURIO2
+        return DEVICE_CENTURIO
 
     def get_sensors(self):
         return self.switches
