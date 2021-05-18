@@ -29,8 +29,8 @@ class Convector2Switches:
                 device=device,
                 param_name="led_off_auto",
                 property_name="led_off_auto",
-                value_on=State.OFF.value,
-                value_off=State.ON.value
+                value_on=State.ON.value,
+                value_off=State.OFF.value
             ),
 
             SwitchDevice(
@@ -42,8 +42,8 @@ class Convector2Switches:
                 device=device,
                 param_name="lcd_on",
                 property_name="lcd_on",
-                value_on=State.OFF.value,
-                value_off=State.ON.value
+                value_on=State.ON.value,
+                value_off=State.OFF.value
             ),
 
             SwitchDevice(
@@ -68,8 +68,8 @@ class Convector2Switches:
                 device=device,
                 param_name="window_open",
                 property_name="window_open",
-                value_on=State.OFF.value,
-                value_off=State.ON.value
+                value_on=State.ON.value,
+                value_off=State.OFF.value
             ),
 
             SwitchDevice(
@@ -81,8 +81,8 @@ class Convector2Switches:
                 device=device,
                 param_name="mute",
                 property_name="mute",
-                value_on=State.OFF.value,
-                value_off=State.ON.value
+                value_on=State.ON.value,
+                value_off=State.OFF.value
             ),
 
             SwitchDevice(

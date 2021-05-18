@@ -87,6 +87,18 @@ class SwitchDevice(CoordinatorEntity, SwitchEntity):
         if result:
             self._update_coordinator_data(params)
 
+    async def async_toggle(self) -> None:
+        """Turn the entity off."""
+        if not getattr(self._device, self._property_name):
+            return
+
+        params = {self._param_name: self._value_off if self.is_on else self._value_on}
+
+        result = await self.coordinator.api.set_device_params(self._uid, params)
+
+        if result:
+            self._update_coordinator_data(params)
+
     def _update(self) -> None:
         """
         Update local data
