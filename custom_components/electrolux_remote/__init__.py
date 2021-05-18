@@ -38,10 +38,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     # with your actual devices.
     session = async_get_clientsession(hass)
     client: ApiInterface = RusclimatApi(
-        entry.data.get(CONF_HOST),
-        entry.data.get(CONF_USERNAME),
-        entry.data.get(CONF_PASSWORD),
-        entry.data.get(CONF_APPCODE),
+        config_entry.data.get(CONF_HOST),
+        config_entry.data.get(CONF_USERNAME),
+        config_entry.data.get(CONF_PASSWORD),
+        config_entry.data.get(CONF_APPCODE),
         session
     )
 
