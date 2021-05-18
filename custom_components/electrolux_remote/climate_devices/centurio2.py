@@ -64,7 +64,7 @@ HA_PRESET_TO_DEVICE = {
     PRESET_I: WaterMode.I.value,
     PRESET_II: WaterMode.II.value,
     PRESET_III: WaterMode.III.value,
-    PRESET_ANTIFREEZE: WaterMode.NO_FROST.value,
+    PRESET_NO_FROST: WaterMode.NO_FROST.value,
     PRESET_SELF_CLEAN: WaterMode.SELF_CLEAN.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
