@@ -59,6 +59,22 @@ class ApiInterface(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
 
+class Api(ApiInterface):
+    """ Wrapper class to the General API """
+
+    def __init__(self, host: str, username: str, password: str, appcode: str, session: ClientSession):
+        self._api = RusclimatApi(host, username, password, appcode, session)
+
+    async def login(self) -> []:
+        return await self._api.login()
+
+    async def get_data(self) -> []:
+        return await self._api.get_data()
+
+    async def set_device_params(self, uid: str, params: dict) -> bool:
+        return await self._api.set_device_params(uid, params)
+
+
 class RusclimatApi(ApiInterface):
     """ Wrapper class to the Rusclimat API """
 
@@ -72,7 +88,6 @@ class RusclimatApi(ApiInterface):
 
     async def login(self) -> []:
         """Auth on server"""
-
         payload = {
             "login": self._username,
             "password": self._password,
@@ -532,7 +547,6 @@ class TestApi(ApiInterface):
             'curr_slot_dropped': '0',
             'curr_scene_dropped': '0'
         }
-
         smart = {
             'tempid': '196934',
             'mode': '1',
@@ -573,6 +587,48 @@ class TestApi(ApiInterface):
             'curr_scene_dropped': '0',
             'online': '1'
         }
+        centurio2 = {
+            'tempid': '188709',
+            'mode': '5',
+            'current_temp': '33',
+            'temp_goal': '35',
+            'timer': '0',
+            'timer_hours': '6',
+            'timer_minutes': '0',
+            'clock_hours': '12',
+            'clock_minutes': '40',
+            'self_clean': '1',
+            'volume': '50',
+            'error': '0',
+            'type': 'centurio2',
+            'code': '0',
+            'economy_morning': '0',
+            'economy_evening': '0',
+            'economy_pause': '0',
+            'power_per_h_1': '700',
+            'power_per_h_2': '1300',
+            'power_per_h_3': '2000',
+            'tariff_1': '0',
+            'tariff_2': '0',
+            'tariff_3': '0',
+            'minutes_diff': '0',
+            'seconds_diff': '0',
+            'timer_hours_store': '0',
+            'timer_minutes_store': '0',
+            'timezone': '3',
+            'uid': '131458',
+            'mac': 'set',
+            'room': 'Водонагреватель',
+            'sort': '0',
+            'curr_slot': '0',
+            'active_slot': '0',
+            'slop': '0',
+            'curr_scene': '0',
+            'curr_scene_id': '0',
+            'wait_slot': '0',
+            'curr_slot_dropped': '0',
+            'curr_scene_dropped': '0',
+            'online': '1'}
 
         self.devices = [
             floor_1,
@@ -580,7 +636,8 @@ class TestApi(ApiInterface):
             convector2,
             centurio,
             convector,
-            smart
+            smart,
+            centurio2
         ]
 
     async def login(self) -> []:

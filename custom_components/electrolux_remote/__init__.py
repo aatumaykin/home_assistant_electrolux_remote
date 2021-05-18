@@ -12,7 +12,7 @@ from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, HOST_RUSKLIMAT, STARTUP_MESSAGE, CONF_APPCODE
-from .api import ApiInterface, RusclimatApi, TestApi
+from .api import ApiInterface, Api
 from .update_coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
     # Store an instance of the "connecting" class that does the work of speaking
     # with your actual devices.
     session = async_get_clientsession(hass)
-    client: ApiInterface = RusclimatApi(
+    client: ApiInterface = Api(
         config_entry.data.get(CONF_HOST),
         config_entry.data.get(CONF_USERNAME),
         config_entry.data.get(CONF_PASSWORD),
