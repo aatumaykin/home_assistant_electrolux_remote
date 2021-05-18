@@ -24,7 +24,7 @@ class WaterMode(IntEnum):
     I = 1
     II = 2
     III = 3
-    ANTIFREEZE = 4
+    NO_FROST = 4
     SELF_CLEAN = 5
     NO_CONNECTION = 6
 

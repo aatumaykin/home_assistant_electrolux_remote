@@ -23,7 +23,7 @@ class Centurio2Switches:
             SwitchDevice(
                 uid=uid,
                 coordinator=coordinator,
-                name=f"Bacteria stop",
+                name=f"Bacteria stop system",
                 icon_on="",
                 icon_off="",
                 device=device,
