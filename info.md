@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 0.0.10
+
+### Fix
+- исправлены ошибки
+
 ## Version 0.0.9
 
 ### Features

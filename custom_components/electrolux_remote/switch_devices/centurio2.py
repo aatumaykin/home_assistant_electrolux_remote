@@ -46,8 +46,8 @@ class Centurio2Switches:
                 device=device,
                 param_name="economy_pause",
                 property_name="economy_pause",
-                value_on=State.ON.value,
-                value_off=State.OFF.value
+                value_on=State.OFF.value,
+                value_off=State.ON.value
             ),
 
             Timer(
