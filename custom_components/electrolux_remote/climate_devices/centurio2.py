@@ -13,6 +13,7 @@ from ..devices.centurio2 import (
     TEMP_MAX,
 )
 from ..update_coordinator import Coordinator
+from ..enums import State
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
@@ -38,7 +39,6 @@ PRESET_I = 'I'
 PRESET_II = 'II'
 PRESET_III = 'III'
 PRESET_NO_FROST = 'NO_FROST'
-PRESET_SELF_CLEAN = 'SELF_CLEAN'
 
 
 SUPPORT_PRESETS = [
@@ -47,7 +47,6 @@ SUPPORT_PRESETS = [
     PRESET_II,
     PRESET_III,
     PRESET_NO_FROST,
-    PRESET_SELF_CLEAN
 ]
 
 """
@@ -65,7 +64,6 @@ HA_PRESET_TO_DEVICE = {
     PRESET_II: WaterMode.II.value,
     PRESET_III: WaterMode.III.value,
     PRESET_NO_FROST: WaterMode.NO_FROST.value,
-    PRESET_SELF_CLEAN: WaterMode.SELF_CLEAN.value,
 }
 DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
 
@@ -82,6 +80,7 @@ class Centurio2Climate(ClimateBase):
         Initialize the climate device
         """
         self.coordinator = coordinator
+        self._prev_mode = WaterMode.OFF.value
 
         super().__init__(
             coordinator=coordinator,
@@ -100,16 +99,18 @@ class Centurio2Climate(ClimateBase):
     @property
     def hvac_mode(self):
         """Return hvac operation """
-        if self.preset_mode == PRESET_OFF:
+        if self.preset_mode == PRESET_OFF and not self._device.timer:
             return HVAC_MODE_OFF
         return HVAC_MODE_HEAT
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         if hvac_mode == HVAC_MODE_HEAT:
-            params = {"mode": WaterMode.I.value}
+            params = {"mode": self._prev_mode if self._prev_mode > 0 else WaterMode.I.value}
         elif hvac_mode == HVAC_MODE_OFF:
-            params = {"mode": WaterMode.OFF.value}
+            self._prev_mode = self._device.mode
+
+            params = {"mode": WaterMode.OFF.value, "timer": State.OFF.value}
         else:
             return
 

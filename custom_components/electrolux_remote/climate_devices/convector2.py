@@ -9,6 +9,7 @@ from .base import ClimateBase
 from ..devices.convector2 import (
     Convector2,
     WorkMode,
+    HeatMode,
     TEMP_MIN,
     TEMP_MAX,
     TEMP_ANTIFROST_MIN,
@@ -97,10 +98,13 @@ class Convector2Climate(ClimateBase):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
+        _LOGGER.debug(f"{hvac_mode}, {self._device.heat_mode_auto}")
         if hvac_mode == HVAC_MODE_AUTO and not self._device.state:
-            params = {"state": State.ON.value}
+            params = {"state": State.ON.value, "heat_mode": HeatMode.AUTO.value}
         elif hvac_mode == HVAC_MODE_AUTO and self._device.state:
             params = {"heat_mode": 1 - self._device.heat_mode}
+        elif hvac_mode == HVAC_MODE_HEAT and self._device.heat_mode_auto:
+            params = {"state": State.ON.value, "heat_mode": HeatMode.MANUAL.value}
         elif hvac_mode == HVAC_MODE_HEAT:
             params = {"state": State.ON.value}
         elif hvac_mode == HVAC_MODE_OFF:

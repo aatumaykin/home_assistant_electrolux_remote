@@ -19,9 +19,10 @@
 
 ## Features
 Поддерживаются устройства Electrolux и Ballu:
-- конвекторы (техническое обозначение: conv и convector24)
-- термостат ETS-16
-- бойлеры (centurio и smart)
+- конвекторы Electrolux с блоком управления Transformer Electronic
+- конвекторы Ballu с блоком управления Transformer Digital Inverter
+- термостат Electrolux ETS-16
+- бойлеры (Сenturio IQ, Centurio IQ 2.0, Smart)
 
 ## Screenshot
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">

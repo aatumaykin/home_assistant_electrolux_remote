@@ -7,7 +7,7 @@ from ..enums import State
 
 _LOGGER = logging.getLogger(__name__)
 
-TEMP_MIN = 30
+TEMP_MIN = 35
 TEMP_MAX = 75
 
 
@@ -24,8 +24,7 @@ class WaterMode(IntEnum):
     I = 1
     II = 2
     III = 3
-    NO_FROST = 4
-    SELF_CLEAN = 5
+    NO_FROST = 5
     NO_CONNECTION = 6
 
 
