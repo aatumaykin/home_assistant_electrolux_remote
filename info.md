@@ -30,6 +30,9 @@ This is **only** intended for development!
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
 ## Version 0.0.10
 
+### Features
+- добавлена поддержка бойлера Electrolux Regency
+
 ### Fix
 - исправлены ошибки
 

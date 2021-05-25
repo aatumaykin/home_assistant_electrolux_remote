@@ -629,6 +629,34 @@ class TestApi(ApiInterface):
             'curr_slot_dropped': '0',
             'curr_scene_dropped': '0',
             'online': '1'}
+        regency = {
+            'tempid': '197924',
+            'state': '3',
+            'timezone': '0',
+            'current_temp': '39',
+            'temp_goal': '75',
+            'error': '0',
+            'type': 'regency',
+            'code': '0',
+            'uid': '197924',
+            'mac': 'set',
+            'room': 'баня',
+            'sort': '0',
+            'curr_slot': '0',
+            'active_slot': '0',
+            'slop': '0',
+            'curr_scene': '0',
+            'curr_scene_id': '0',
+            'wait_slot': '0',
+            'curr_slot_dropped': '0',
+            'curr_scene_dropped': '0',
+            'clock_hours': '0',
+            'clock_minutes': '47',
+            'timer_hours': '0',
+            'timer_minutes': '0',
+            'self_clean': '1',
+            'online': '1'
+        }
 
         self.devices = [
             floor_1,
@@ -637,7 +665,8 @@ class TestApi(ApiInterface):
             centurio,
             convector,
             smart,
-            centurio2
+            centurio2,
+            regency
         ]
 
     async def login(self) -> []:

@@ -7,7 +7,8 @@ from .climate_devices.convector2 import Convector2Climate
 from .climate_devices.thermostat import Thermostat2Climate
 from .climate_devices.centurio import CenturioClimate
 from .climate_devices.centurio2 import Centurio2Climate
-from .climate_devices.smart import Smart2Climate
+from .climate_devices.smart import SmartClimate
+from .climate_devices.regency import RegencyClimate
 
 from .const import DOMAIN
 from .update_coordinator import Coordinator
@@ -45,8 +46,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
             if deviceData["type"] == Centurio2Climate.device_type():
                 device = Centurio2Climate(deviceData["uid"], coordinator)
 
-            if deviceData["type"] == Smart2Climate.device_type():
-                device = Smart2Climate(deviceData["uid"], coordinator)
+            if deviceData["type"] == SmartClimate.device_type():
+                device = SmartClimate(deviceData["uid"], coordinator)
+
+            if deviceData["type"] == RegencyClimate.device_type():
+                device = RegencyClimate(deviceData["uid"], coordinator)
 
             if device is not None:
                 _LOGGER.debug(f"add device: {device.name}")

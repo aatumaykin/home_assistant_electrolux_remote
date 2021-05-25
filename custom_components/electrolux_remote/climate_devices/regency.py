@@ -1,14 +1,14 @@
-"""Smart to Climate class"""
+"""Regency to Climate class"""
 
 import logging
 
 from typing import Any, Dict, Optional
 
-from ..const import DEVICE_SMART
+from ..const import DEVICE_REGENCY
 from .base import ClimateBase
-from ..devices.smart import (
-    Smart,
-    WaterMode,
+from..enums import State
+from ..devices.regency import (
+    Regency,
     TEMP_MIN,
     TEMP_MAX,
 )
@@ -16,7 +16,6 @@ from ..update_coordinator import Coordinator
 
 from homeassistant.components.climate.const import (
     SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_PRESET_MODE,
     HVAC_MODE_HEAT,
     HVAC_MODE_OFF,
     CURRENT_HVAC_HEAT,
@@ -31,18 +30,7 @@ from homeassistant.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
-
-PRESET_OFF = 'off'
-PRESET_HALF = 'I'
-PRESET_FULL = 'II'
-
-
-SUPPORT_PRESETS = [
-    PRESET_OFF,
-    PRESET_HALF,
-    PRESET_FULL,
-]
+SUPPORT_FLAGS = SUPPORT_TARGET_TEMPERATURE
 
 """
 Supported hvac modes:
@@ -53,17 +41,10 @@ Supported hvac modes:
 """
 SUPPORT_MODES = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
 
-HA_PRESET_TO_DEVICE = {
-    PRESET_OFF: WaterMode.OFF.value,
-    PRESET_HALF: WaterMode.HALF.value,
-    PRESET_FULL: WaterMode.FULL.value,
-}
-DEVICE_PRESET_TO_HA = {v: k for k, v in HA_PRESET_TO_DEVICE.items()}
-
-DEFAULT_NAME = "Smart"
+DEFAULT_NAME = "Regency"
 
 
-class SmartClimate(ClimateBase):
+class RegencyClimate(ClimateBase):
     """
     Representation of a climate device
     """
@@ -80,28 +61,28 @@ class SmartClimate(ClimateBase):
             name=DEFAULT_NAME,
             support_flags=SUPPORT_FLAGS,
             support_modes=SUPPORT_MODES,
-            support_presets=SUPPORT_PRESETS,
-            device=Smart()
+            support_presets=[],
+            device=Regency()
         )
 
     @staticmethod
     def device_type() -> str:
-        return DEVICE_SMART
+        return DEVICE_REGENCY
 
     @property
     def hvac_mode(self):
         """Return hvac operation """
-        if self.preset_mode == PRESET_OFF:
-            return HVAC_MODE_OFF
-        return HVAC_MODE_HEAT
+        if self._device.state:
+            return HVAC_MODE_HEAT
+        return HVAC_MODE_OFF
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
 
         if hvac_mode == HVAC_MODE_HEAT:
-            params = {"mode": WaterMode.HALF.value}
+            params = {"state": State.ON.value}
         elif hvac_mode == HVAC_MODE_OFF:
-            params = {"mode": WaterMode.OFF.value}
+            params = {"state": State.OFF.value}
         else:
             return
 
@@ -113,29 +94,9 @@ class SmartClimate(ClimateBase):
     @property
     def hvac_action(self) -> Optional[str]:
         """Return the current running hvac operation if supported.  Need to be one of CURRENT_HVAC_*.  """
-        if self.preset_mode == PRESET_OFF:
-            return CURRENT_HVAC_OFF
-        return CURRENT_HVAC_HEAT
-
-    async def async_set_preset_mode(self, preset_mode) -> None:
-        """Set a new preset mode. If preset_mode is None, then revert to auto."""
-        _LOGGER.debug(preset_mode)
-
-        if self.preset_mode == preset_mode:
-            return
-
-        if preset_mode not in SUPPORT_PRESETS:
-            _LOGGER.warning(
-                "%s: set preset mode to '%s' is not supported. "
-                "Supported preset modes are %s",
-                self._name, preset_mode, SUPPORT_PRESETS)
-            return None
-
-        params = {"mode": HA_PRESET_TO_DEVICE.get(preset_mode, PRESET_OFF)}
-        result = await self.coordinator.api.set_device_params(self._uid, params)
-
-        if result:
-            self._update_coordinator_data(params)
+        if self._device.state:
+            return CURRENT_HVAC_HEAT
+        return CURRENT_HVAC_OFF
 
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperature."""
@@ -173,25 +134,15 @@ class SmartClimate(ClimateBase):
         return {
             "clock_hours": self._device.clock_hours,
             "clock_minutes": self._device.clock_minutes,
-            "self_clean": self._device.self_clean,
-            "volume": self._device.volume.value,
-            "self_clean_state": self._device.self_clean_state.value,
-            "economy_state": self._device.economy_state,
-            "economy_morning": self._device.economy_morning,
-            "economy_evening": self._device.economy_evening,
-            "economy_pause": self._device.economy_pause,
-            "power_per_h_1": self._device.power_per_h_1,
-            "power_per_h_2": self._device.power_per_h_2,
-            "timezone": self._device.timezone,
             "room": self._device.room,
         }
 
     async def async_turn_on(self) -> None:
         """Turn the entity on."""
-        if self._device.mode.value > 0:
+        if self._device.state:
             return
 
-        params = {"mode": WaterMode.HALF.value}
+        params = {"state": State.ON.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -200,10 +151,10 @@ class SmartClimate(ClimateBase):
 
     async def async_turn_off(self) -> None:
         """Turn the entity off."""
-        if not self._device.mode.value > 0:
+        if not self._device.state:
             return
 
-        params = {"mode": WaterMode.OFF.value}
+        params = {"state": State.OFF.value}
 
         result = await self.coordinator.api.set_device_params(self._uid, params)
 
@@ -234,11 +185,6 @@ class SmartClimate(ClimateBase):
     def max_temp(self) -> float:
         """Return the maximum temperature."""
         return TEMP_MAX
-
-    @property
-    def preset_mode(self) -> Optional[str]:
-        """Return the current preset mode, e.g., home, away, temp."""
-        return DEVICE_PRESET_TO_HA.get(self._device.mode.value)
 
     def _update(self) -> None:
         """
