@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 from ..const import DEVICE_REGENCY
 from .base import ClimateBase
-from..enums import State
+from ..enums import State
 from ..devices.regency import (
     Regency,
     TEMP_MIN,
@@ -26,7 +26,6 @@ from homeassistant.const import (
     ATTR_TEMPERATURE,
     PRECISION_TENTHS,
 )
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -106,7 +105,7 @@ class RegencyClimate(ClimateBase):
             return
 
         if (target_temperature < self.min_temp or
-                target_temperature > self.max_temp):
+            target_temperature > self.max_temp):
             _LOGGER.warning(
                 "%s: set target temperature to %s°C is not supported. "
                 "The temperature can be set between %s°C and %s°C",
@@ -194,3 +193,6 @@ class RegencyClimate(ClimateBase):
             if data["uid"] == self._uid:
                 self._device.from_json(data)
 
+    @property
+    def icon(self) -> str:
+        return 'mdi:water-boiler'

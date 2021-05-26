@@ -36,7 +36,6 @@ class ClimateBase(CoordinatorEntity, ClimateEntity):
         """
         super().__init__(coordinator)
 
-        self._icon = "mdi:radiator"
         self._uid = uid
         self._name = f"{name} {uid}"
         self._support_flags = support_flags

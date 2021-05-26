@@ -328,3 +328,6 @@ class Convector2Climate(ClimateBase):
             if data["uid"] == self._uid:
                 self._device.from_json(data)
 
+    @property
+    def icon(self) -> str:
+        return 'mdi:radiator'
