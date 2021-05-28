@@ -2,12 +2,17 @@
 
 import logging
 
+from typing import Any, Dict
 from ..enums import State
+from ..const import DEVICE_REGENCY, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 35
 TEMP_MAX = 75
+
+DEFAULT_NAME = "Regency"
+ICON = "mdi:water-boiler"
 
 
 class Regency:
@@ -52,3 +57,17 @@ class Regency:
     @property
     def state(self) -> bool:
         return int(self._state) != State.OFF.value
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_REGENCY
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

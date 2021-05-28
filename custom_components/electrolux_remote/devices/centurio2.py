@@ -2,13 +2,19 @@
 
 import logging
 
-from enum import Enum, IntEnum
+from typing import Any, Dict
+from enum import IntEnum
+
 from ..enums import State
+from ..const import DEVICE_CENTURIO2, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 35
 TEMP_MAX = 75
+
+DEFAULT_NAME = "Centurio IQ 2.0"
+ICON = "mdi:water-boiler"
 
 
 class Capacity(IntEnum):
@@ -42,8 +48,6 @@ class Centurio2:
         self._clock_minutes = 0
         self._self_clean = State.OFF.value  # bacteria stop system
         self._volume = Capacity.CAPACITY_100.value
-        self._error = 0
-        self._code = 0
         self._economy_morning = 0
         self._economy_evening = 0
         self._economy_pause = State.OFF.value
@@ -58,15 +62,6 @@ class Centurio2:
         self._timezone = 0
         self._timer_hours_store = 0
         self._timer_minutes_store = 0
-        self._sort = 0
-        self._curr_slot = 0
-        self._active_slot = 0
-        self._slop = 0
-        self._curr_scene = 0
-        self._curr_scene_id = 0
-        self._wait_slot = 0
-        self._curr_slot_dropped = 0
-        self._curr_scene_dropped = 0
 
     def from_json(self, data: dict):
         """Fill self from json data"""
@@ -168,3 +163,17 @@ class Centurio2:
     @property
     def seconds_diff(self) -> int:
         return int(self._seconds_diff)
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_CENTURIO2
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

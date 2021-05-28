@@ -2,13 +2,18 @@
 
 import logging
 
+from typing import Any, Dict
 from enum import Enum, IntEnum
 from ..enums import State
+from ..const import DEVICE_SMART, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 30
 TEMP_MAX = 75
+
+DEFAULT_NAME = "Smart"
+ICON = "mdi:water-boiler"
 
 
 class WaterSelfCleanState(Enum):
@@ -47,8 +52,6 @@ class Smart:
         self._temp_goal = 75
         self._self_clean = State.OFF.value  # bacteria stop system
         self._volume = Capacity.CAPACITY_100.value
-        self._error = 0
-        self._code = 0
         self._self_clean_state = WaterSelfCleanState.OFF.value
         self._economy_morning = 0
         self._economy_evening = 0
@@ -61,15 +64,6 @@ class Smart:
         self._clock_hours = 0
         self._clock_minutes = 0
         self._timezone = 0
-        self._sort = 0
-        self._curr_slot = 0
-        self._active_slot = 0
-        self._slop = 0
-        self._curr_scene = 0
-        self._curr_scene_id = 0
-        self._wait_slot = 0
-        self._curr_slot_dropped = 0
-        self._curr_scene_dropped = 0
 
     def from_json(self, data: dict):
         """Fill self from json data"""
@@ -143,3 +137,17 @@ class Smart:
     @property
     def timezone(self) -> int:
         return int(self._timezone)
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_SMART
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

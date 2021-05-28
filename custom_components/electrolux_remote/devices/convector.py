@@ -2,13 +2,18 @@
 
 import logging
 
+from typing import Any, Dict
 from enum import IntEnum
 from ..enums import State
+from ..const import DEVICE_CONVECTOR, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 5
 TEMP_MAX = 35
+
+DEFAULT_NAME = "Convector"
+ICON = "mdi:radiator"
 
 
 class PowerMode(IntEnum):
@@ -40,8 +45,6 @@ class Convector:
         self._minutes = 0
         self._timer = State.OFF.value
 
-        self._tempid = None
-        self._mac = None
         self._room = None   # название помещения
         self._lock = State.OFF.value    # режим блокировки
 
@@ -101,3 +104,17 @@ class Convector:
     @property
     def led(self) -> bool:
         return int(self._led) == State.OFF.value
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_CONVECTOR
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

@@ -2,8 +2,10 @@
 
 import logging
 
+from typing import Any, Dict
 from enum import IntEnum
 from ..enums import State
+from ..const import DEVICE_CONVECTOR24, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,6 +16,9 @@ TEMP_MAX = 35
 
 TEMP_ANTIFROST_MIN = 3
 TEMP_ANTIFROST_MAX = 7
+
+DEFAULT_NAME = "Convector"
+ICON = "mdi:radiator"
 
 
 class Preset(IntEnum):
@@ -80,9 +85,6 @@ class Convector2:
         self._delta_eco = DELTA_ECO_DEFAULT             # дельта для ночной температуры
         self._temp_antifrost = TEMP_ANTIFROST_MIN       # температура для анти-фрост
         self._mode = WorkMode.COMFORT.value             # режим работы
-        self._mode_temp_1 = 0
-        self._mode_temp_2 = 0
-        self._mode_temp_3 = 0
         # таймер
         self._hours = 0
         self._minutes = 0
@@ -91,7 +93,6 @@ class Convector2:
         self._current_temp = 0
         self._heat_mode = HeatMode.AUTO.value   # режим обогрева: авто или ручной
         self._power = PowerMode.POWER_0.value   # можность обогрева
-        self._code = 0
         self._lcd_on = State.ON.value
         # текущие дата и время
         self._time_seconds = 0
@@ -134,18 +135,7 @@ class Convector2:
         self._preset_day_23 = WorkMode.OFF.value
         self._preset_day_24 = WorkMode.OFF.value
 
-        self._tempid = None
-        self._mac = None
         self._room = None   # название помещения
-        self._sort = 0
-        self._curr_slot = None
-        self._active_slot = None
-        self._slop = None
-        self._curr_scene = None
-        self._curr_scene_id = None
-        self._wait_slot = None
-        self._curr_slot_dropped = 0
-        self._curr_scene_dropped = 0
         self._lock = State.OFF.value    # режим блокировки
 
     def from_json(self, data: dict):
@@ -279,34 +269,6 @@ class Convector2:
     @property
     def time_weekday(self) -> int:
         return int(self._time_weekday)
-
-    @property
-    def code(self) -> int:
-        return int(self._code)
-
-    @property
-    def curr_scene_dropped(self) -> int:
-        return int(self._curr_scene_dropped)
-
-    @property
-    def curr_slot_dropped(self) -> int:
-        return int(self._curr_slot_dropped)
-
-    @property
-    def curr_scene(self) -> str:
-        return self._curr_scene
-
-    @property
-    def curr_slot(self) -> int:
-        return int(self._curr_slot)
-
-    @property
-    def mac(self) -> str:
-        return self._mac
-
-    @property
-    def sort(self) -> int:
-        return int(self._sort)
 
     @property
     def preset_monday(self) -> int:
@@ -447,3 +409,17 @@ class Convector2:
     @property
     def online(self) -> bool:
         return int(self._online) == State.ON.value
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_CONVECTOR24
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

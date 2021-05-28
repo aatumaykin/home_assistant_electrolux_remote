@@ -22,7 +22,6 @@ class Coordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, client: ApiInterface, ) -> None:
         """Initialize."""
         self.api = client
-        self.platforms = []
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
 
     async def _async_update_data(self):

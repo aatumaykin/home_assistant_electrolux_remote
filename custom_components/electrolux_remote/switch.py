@@ -22,35 +22,36 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
     try:
         for deviceData in coordinator.data:
-            if deviceData["type"] == ConvectorSwitches.device_type():
-                devices = ConvectorSwitches(deviceData["uid"], coordinator).get_sensors()
-                for device in devices:
-                    _LOGGER.debug(f"add device: {device.name}")
-                async_add_devices(devices)
-
-            if deviceData["type"] == Convector2Switches.device_type():
-                devices = Convector2Switches(deviceData["uid"], coordinator).get_sensors()
-                for device in devices:
-                    _LOGGER.debug(f"add device: {device.name}")
-                async_add_devices(devices)
-
-            if deviceData["type"] == SmartSwitches.device_type():
-                devices = SmartSwitches(deviceData["uid"], coordinator).get_sensors()
-                for device in devices:
-                    _LOGGER.debug(f"add device: {device.name}")
-                async_add_devices(devices)
-
-            if deviceData["type"] == CenturioSwitches.device_type():
-                devices = CenturioSwitches(deviceData["uid"], coordinator).get_sensors()
-                for device in devices:
-                    _LOGGER.debug(f"add device: {device.name}")
-                async_add_devices(devices)
-
-            if deviceData["type"] == Centurio2Switches.device_type():
-                devices = Centurio2Switches(deviceData["uid"], coordinator).get_sensors()
-                for device in devices:
-                    _LOGGER.debug(f"add device: {device.name}")
-                async_add_devices(devices)
+            pass
+            # if deviceData["type"] == ConvectorSwitches.device_type():
+            #     devices = ConvectorSwitches(deviceData["uid"], coordinator).get_sensors()
+            #     for device in devices:
+            #         _LOGGER.debug(f"add device: {device.name}")
+            #     async_add_devices(devices)
+            #
+            # if deviceData["type"] == Convector2Switches.device_type():
+            #     devices = Convector2Switches(deviceData["uid"], coordinator).get_sensors()
+            #     for device in devices:
+            #         _LOGGER.debug(f"add device: {device.name}")
+            #     async_add_devices(devices)
+            #
+            # if deviceData["type"] == SmartSwitches.device_type():
+            #     devices = SmartSwitches(deviceData["uid"], coordinator).get_sensors()
+            #     for device in devices:
+            #         _LOGGER.debug(f"add device: {device.name}")
+            #     async_add_devices(devices)
+            #
+            # if deviceData["type"] == CenturioSwitches.device_type():
+            #     devices = CenturioSwitches(deviceData["uid"], coordinator).get_sensors()
+            #     for device in devices:
+            #         _LOGGER.debug(f"add device: {device.name}")
+            #     async_add_devices(devices)
+            #
+            # if deviceData["type"] == Centurio2Switches.device_type():
+            #     devices = Centurio2Switches(deviceData["uid"], coordinator).get_sensors()
+            #     for device in devices:
+            #         _LOGGER.debug(f"add device: {device.name}")
+            #     async_add_devices(devices)
 
     except Exception as err:
         _LOGGER.error(err)

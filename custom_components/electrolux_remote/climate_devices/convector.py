@@ -249,3 +249,4 @@ class ConvectorClimate(ClimateBase):
     @property
     def icon(self) -> str:
         return 'mdi:radiator'
+

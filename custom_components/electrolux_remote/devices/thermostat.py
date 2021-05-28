@@ -2,13 +2,18 @@
 
 import logging
 
+from typing import Any, Dict
 from enum import IntEnum
 from ..enums import State
+from ..const import DEVICE_FLOOR, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 TEMP_MIN = 0
 TEMP_MAX = 40
+
+DEFAULT_NAME = "Thermostat"
+ICON = "mdi:thermostat"
 
 
 class WorkMode(IntEnum):
@@ -49,7 +54,6 @@ class Thermostat:
     def __init__(self):
         self._state = State.OFF.value
         self._online = State.OFF.value
-        self._error = 0
         self._set_temp = 240  # выставленная температура
         self._room_temp = 275  # комнатная температура
         self._set_room_temp = 38
@@ -73,17 +77,7 @@ class Thermostat:
         self._timezone = 0
         self._hours = 0
         self._minutes = 0
-        self._mac = None
         self._room = None  # название помещения
-        self._sort = 0
-        self._curr_slot = 0
-        self._active_slot = 0
-        self._slop = 0
-        self._curr_scene = 0
-        self._curr_scene_id = 0
-        self._wait_slot = 0
-        self._curr_slot_dropped = 0
-        self._curr_scene_dropped = 0
         self._set_temp_1 = 0
         self._set_temp_0 = 240
         self._room_temp_1 = 1
@@ -181,3 +175,17 @@ class Thermostat:
     @property
     def online(self) -> bool:
         return int(self._online) == State.ON.value
+
+    @staticmethod
+    def device_type() -> str:
+        return DEVICE_FLOOR
+
+    @staticmethod
+    def device_info(data: dict) -> Dict[str, Any]:
+        """Device information for entities."""
+        return {
+            "identifiers": {(DOMAIN, data["uid"])},
+            "name": DEFAULT_NAME,
+            "suggested_area": data["room"],
+            "model": data["type"],
+        }

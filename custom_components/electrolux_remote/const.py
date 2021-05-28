@@ -30,3 +30,10 @@ DEVICE_CONVECTOR24 = "convector24"
 DEVICE_SMART = "smart"
 DEVICE_FLOOR = "floor"
 DEVICE_REGENCY = "regency"
+
+SERVICE_UPDATE_STATE = "update_state"
+
+MANUFACTURER = {
+    APPCODE_ELECTROLUX: 'Electrolux',
+    APPCODE_BALLU: 'Ballu'
+}

@@ -52,9 +52,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
             if deviceData["type"] == RegencyClimate.device_type():
                 device = RegencyClimate(deviceData["uid"], coordinator)
 
-            if device is not None:
-                _LOGGER.debug(f"add device: {device.name}")
-                devices.append(device)
+            # if device is not None:
+                # _LOGGER.debug(f"add device: {device.name}")
+                # devices.append(device)
 
     except Exception as err:
         _LOGGER.error(err)
