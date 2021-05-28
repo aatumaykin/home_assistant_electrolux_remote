@@ -22,7 +22,7 @@
 - конвекторы Electrolux с блоком управления Transformer Electronic
 - конвекторы Ballu с блоком управления Transformer Digital Inverter
 - термостат Electrolux ETS-16
-- бойлеры (Сenturio IQ, Centurio IQ 2.0, Smart)
+- бойлеры (Сenturio IQ, Centurio IQ 2.0, Smart, Regency)
 
 ## Screenshot
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-1.png?raw=true" width="250">
@@ -34,6 +34,18 @@
 
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-5.png?raw=true" width="250">
 <img src="https://github.com/Ailme/home_assistant_electrolux_remote/blob/main/img/img-6.png?raw=true" width="250">
+
+
+## Debug
+
+Добавьте в `configuration.yaml`:
+
+```yaml
+logger:
+  default: warning
+  logs:
+    custom_components.electrolux_remote: debug
+```
 
 ---
 

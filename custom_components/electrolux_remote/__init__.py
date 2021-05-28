@@ -43,8 +43,8 @@ SUPPORTED_DEVICES = [
     Convector,
     Convector2,
     Regency,
-    # Smart,
-    # Thermostat
+    Smart,
+    Thermostat
 ]
 
 
