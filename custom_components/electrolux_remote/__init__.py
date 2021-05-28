@@ -40,8 +40,8 @@ PLATFORMS = [
 SUPPORTED_DEVICES = [
     Centurio,
     Centurio2,
-    # Convector,
-    # Convector2,
+    Convector,
+    Convector2,
     # Regency,
     # Smart,
     # Thermostat

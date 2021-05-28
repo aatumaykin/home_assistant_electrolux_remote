@@ -17,7 +17,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     Setup the climate platform
     """
     coordinator: Coordinator = hass.data[DOMAIN][config_entry.entry_id]
-    _LOGGER.debug("climate")
 
     devices = []
 

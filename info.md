@@ -28,6 +28,12 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 1.0.0
+
+### Features
+- переписан компонент. Теперь устройства собраны в группы в карточке интеграции
+- добавлена служба electrolux_remote.update_state для запроса актуальных данных с сервера 
+
 ## Version 0.0.10
 
 ### Features

@@ -15,7 +15,6 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_devices):
     """Setup switch platform."""
     coordinator: Coordinator = hass.data[DOMAIN][config_entry.entry_id]
-    _LOGGER.debug("switch")
 
     try:
         for deviceData in coordinator.data:

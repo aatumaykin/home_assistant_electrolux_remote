@@ -628,7 +628,8 @@ class TestApi(ApiInterface):
             'wait_slot': '0',
             'curr_slot_dropped': '0',
             'curr_scene_dropped': '0',
-            'online': '1'}
+            'online': '1'
+        }
         regency = {
             'tempid': '197924',
             'state': '3',
