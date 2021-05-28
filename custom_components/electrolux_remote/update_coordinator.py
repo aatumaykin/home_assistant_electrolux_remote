@@ -29,7 +29,7 @@ class Coordinator(DataUpdateCoordinator):
         try:
             data = await self.api.get_data()
 
-            _LOGGER.debug(f"received data: {data}")
+            # _LOGGER.debug(f"received data: {data}")
 
             return data
         except Exception as exception:

@@ -97,8 +97,8 @@ class Centurio:
         self._online = State.OFF.value
         self._room = None  # название помещения
         self._mode = WaterMode.OFF.value  # мощность нагрева
-        self._current_temp = 75
-        self._temp_goal = 75
+        self._current_temp = 75  # текущая температура
+        self._temp_goal = 75  # указанная температура
         self._timer = State.OFF.value
         self._timer_hours = 0
         self._timer_minutes = 0
