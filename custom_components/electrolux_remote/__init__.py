@@ -42,7 +42,7 @@ SUPPORTED_DEVICES = [
     Centurio2,
     Convector,
     Convector2,
-    # Regency,
+    Regency,
     # Smart,
     # Thermostat
 ]
