@@ -12,7 +12,6 @@ TEMP_MIN = 35
 TEMP_MAX = 75
 
 DEFAULT_NAME = "Regency"
-ICON = "mdi:water-boiler"
 
 
 class Regency:

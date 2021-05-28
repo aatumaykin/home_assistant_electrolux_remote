@@ -14,7 +14,6 @@ TEMP_MIN = 35
 TEMP_MAX = 75
 
 DEFAULT_NAME = "Centurio IQ 2.0"
-ICON = "mdi:water-boiler"
 
 
 class Capacity(IntEnum):

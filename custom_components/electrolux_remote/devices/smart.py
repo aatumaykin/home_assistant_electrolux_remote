@@ -13,7 +13,6 @@ TEMP_MIN = 30
 TEMP_MAX = 75
 
 DEFAULT_NAME = "Smart"
-ICON = "mdi:water-boiler"
 
 
 class WaterSelfCleanState(Enum):

@@ -2,13 +2,9 @@
 
 import logging
 
+from . import SUPPORTED_DEVICES
 from .const import DOMAIN
 from .update_coordinator import Coordinator
-from .switch_devices.convector import ConvectorSwitches
-from .switch_devices.convector2 import Convector2Switches
-from .switch_devices.smart import SmartSwitches
-from .switch_devices.centurio import CenturioSwitches
-from .switch_devices.centurio2 import Centurio2Switches
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -19,39 +15,13 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_devices):
     """Setup switch platform."""
     coordinator: Coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    _LOGGER.debug("switch")
 
     try:
         for deviceData in coordinator.data:
-            pass
-            # if deviceData["type"] == ConvectorSwitches.device_type():
-            #     devices = ConvectorSwitches(deviceData["uid"], coordinator).get_sensors()
-            #     for device in devices:
-            #         _LOGGER.debug(f"add device: {device.name}")
-            #     async_add_devices(devices)
-            #
-            # if deviceData["type"] == Convector2Switches.device_type():
-            #     devices = Convector2Switches(deviceData["uid"], coordinator).get_sensors()
-            #     for device in devices:
-            #         _LOGGER.debug(f"add device: {device.name}")
-            #     async_add_devices(devices)
-            #
-            # if deviceData["type"] == SmartSwitches.device_type():
-            #     devices = SmartSwitches(deviceData["uid"], coordinator).get_sensors()
-            #     for device in devices:
-            #         _LOGGER.debug(f"add device: {device.name}")
-            #     async_add_devices(devices)
-            #
-            # if deviceData["type"] == CenturioSwitches.device_type():
-            #     devices = CenturioSwitches(deviceData["uid"], coordinator).get_sensors()
-            #     for device in devices:
-            #         _LOGGER.debug(f"add device: {device.name}")
-            #     async_add_devices(devices)
-            #
-            # if deviceData["type"] == Centurio2Switches.device_type():
-            #     devices = Centurio2Switches(deviceData["uid"], coordinator).get_sensors()
-            #     for device in devices:
-            #         _LOGGER.debug(f"add device: {device.name}")
-            #     async_add_devices(devices)
+            for device in SUPPORTED_DEVICES:
+                if deviceData["type"] == device.device_type() and device.support_switches():
+                    async_add_devices(device.get_switches(deviceData, coordinator))
 
     except Exception as err:
         _LOGGER.error(err)

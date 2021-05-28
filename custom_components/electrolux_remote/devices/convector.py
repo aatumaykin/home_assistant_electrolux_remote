@@ -13,7 +13,6 @@ TEMP_MIN = 5
 TEMP_MAX = 35
 
 DEFAULT_NAME = "Convector"
-ICON = "mdi:radiator"
 
 
 class PowerMode(IntEnum):

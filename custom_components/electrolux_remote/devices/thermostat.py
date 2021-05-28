@@ -13,7 +13,6 @@ TEMP_MIN = 0
 TEMP_MAX = 40
 
 DEFAULT_NAME = "Thermostat"
-ICON = "mdi:thermostat"
 
 
 class WorkMode(IntEnum):

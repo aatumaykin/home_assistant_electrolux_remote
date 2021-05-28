@@ -18,7 +18,6 @@ TEMP_ANTIFROST_MIN = 3
 TEMP_ANTIFROST_MAX = 7
 
 DEFAULT_NAME = "Convector"
-ICON = "mdi:radiator"
 
 
 class Preset(IntEnum):

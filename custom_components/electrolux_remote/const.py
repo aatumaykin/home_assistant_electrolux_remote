@@ -37,3 +37,7 @@ MANUFACTURER = {
     APPCODE_ELECTROLUX: 'Electrolux',
     APPCODE_BALLU: 'Ballu'
 }
+
+ICON_BOILER = "mdi:water-boiler"
+ICON_CONVECTOR = "mdi:radiator"
+ICON_THERMOSTAT = "mdi:thermostat"
