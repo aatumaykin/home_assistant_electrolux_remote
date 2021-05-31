@@ -3,7 +3,7 @@
 NAME = "{{ Electrolux remote }}"
 DOMAIN = "electrolux_remote"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 ISSUE_URL = "https://github.com/Ailme/home_assistant_electrolux_remote/issues"
 
 CONF_APPCODE = "appcode"
@@ -31,7 +31,7 @@ DEVICE_SMART = "smart"
 DEVICE_FLOOR = "floor"
 DEVICE_REGENCY = "regency"
 
-SERVICE_UPDATE_STATE = "update_state"
+SERVICE_FETCH_STATE = "fetch_state"
 
 MANUFACTURER = {
     APPCODE_ELECTROLUX: 'Electrolux',

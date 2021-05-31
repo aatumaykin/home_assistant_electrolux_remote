@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 1.0.1
+
+### Fix
+- служба electrolux_remote.update_state переименована в electrolux_remote.fetch_state
+
 ## Version 1.0.0
 
 ### Features

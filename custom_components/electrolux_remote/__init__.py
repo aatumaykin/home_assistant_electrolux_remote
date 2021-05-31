@@ -16,8 +16,8 @@ from .const import (
     HOST_RUSKLIMAT,
     STARTUP_MESSAGE,
     CONF_APPCODE,
-    SERVICE_UPDATE_STATE,
-    MANUFACTURER
+    SERVICE_FETCH_STATE,
+    MANUFACTURER,
 )
 from .api import ApiInterface, Api
 from .update_coordinator import Coordinator
@@ -111,7 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
         """Update all data."""
         await coordinator.async_refresh()
 
-    hass.services.async_register(DOMAIN, SERVICE_UPDATE_STATE, async_update)
+    hass.services.async_register(DOMAIN, SERVICE_FETCH_STATE, async_update)
 
     return True
 
