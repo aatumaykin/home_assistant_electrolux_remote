@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 1.1.0
+
+### Features
+- повторный опрос статуса устройств, если произошел сбой при обращении к серверу
+
 ## Version 1.0.1
 
 ### Fix
