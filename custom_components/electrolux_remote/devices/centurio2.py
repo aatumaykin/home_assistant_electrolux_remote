@@ -536,7 +536,7 @@ class Timer(CoordinatorEntity, SwitchEntity):
         super().__init__(coordinator)
 
         self._uid = uid
-        self._name = f"{name} {uid}"
+        self._name = name
         self._icon_on = "mdi:timer"
         self._icon_off = "mdi:timer-off"
         self._device = device

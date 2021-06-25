@@ -28,6 +28,11 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+## Version 2.0.1
+
+### Fix
+- исправлено имя для timer
+
 ## Version 2.0.0
 
 ### Features
