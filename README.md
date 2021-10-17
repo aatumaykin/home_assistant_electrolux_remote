@@ -7,6 +7,9 @@
 [![Project Maintenance][maintenance-shield]][user_profile]
 
 
+# ! В связи с тем, что Русклимат поменял API, компонент больше не работает !
+
+---
 
 Компонент работает через облако эмулируя работу приложения Home Comfort: climatic appliances и Ballu Home
 

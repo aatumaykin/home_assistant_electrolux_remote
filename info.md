@@ -28,6 +28,8 @@
 This is **only** intended for development!
 
 {%- elif (version_installed.replace("v", "").split(".")[0] | int) < 1 %}
+# ! В связи с тем, что Русклимат поменял API, компонент больше не работает !
+
 ## Version 2.0.1
 
 ### Fix
